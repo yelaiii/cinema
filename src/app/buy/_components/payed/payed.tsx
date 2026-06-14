@@ -4,7 +4,7 @@ import { Check } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Typography } from '@/components/ui/typography'
-import { parseDateString } from '@/utils/parse-date-string'
+import { parseDDMMYY } from '@/utils/parse-date-string'
 
 import { usePayed } from './hooks/use-payed'
 
@@ -47,7 +47,7 @@ export function Payed() {
             Дата и время
           </Typography>
           <Typography variant="body-sm" className="font-semibold text-primary">
-            {parseDateString(state.date!).toLocaleDateString('ru-RU', {
+            {parseDDMMYY(state.date!).toLocaleDateString('ru-RU', {
               day: 'numeric',
               month: 'long',
             })}{' '}

@@ -2,7 +2,7 @@ import { useDisclosure } from '@siberiacancode/reactuse'
 
 import type { CinemaTicket } from '@/api'
 
-import { parseDateString } from '@/utils/parse-date-string'
+import { parseDDMMYY } from '@/utils/parse-date-string'
 
 import { returnTicketAction } from '../actions/return-ticket'
 
@@ -11,7 +11,7 @@ interface TicketCardProps {
 }
 
 export function useTicketCard({ ticket }: TicketCardProps) {
-  const date = parseDateString(ticket.seance.date)
+  const date = parseDDMMYY(ticket.seance.date)
 
   const drawer = useDisclosure()
 

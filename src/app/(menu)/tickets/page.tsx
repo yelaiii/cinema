@@ -1,7 +1,7 @@
 import { getCinemaOrders } from '@/api'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Typography } from '@/components/ui/typography'
-import { parseDateString } from '@/utils/parse-date-string'
+import { parseDDMMYY } from '@/utils/parse-date-string'
 
 import { TicketCard } from './_components/ticket-card'
 
@@ -15,7 +15,7 @@ export default async function TicketsPage() {
   const now = new Date()
 
   for (const ticket of tickets) {
-    const date = parseDateString(ticket.seance.date)
+    const date = parseDDMMYY(ticket.seance.date)
     const [hours, minutes] = ticket.seance.time.split(':')
     date.setHours(+hours, +minutes)
 

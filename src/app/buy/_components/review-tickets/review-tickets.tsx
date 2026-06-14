@@ -4,7 +4,7 @@ import { ChevronLeft, TicketIcon } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Typography } from '@/components/ui/typography'
-import { parseDateString } from '@/utils/parse-date-string'
+import { parseDDMMYY } from '@/utils/parse-date-string'
 
 import { useReviewTickets } from './hooks/use-review-tickets'
 
@@ -60,7 +60,7 @@ export function ReviewTickets() {
               </Typography>
               <Typography variant="body-sm">
                 {state.date &&
-                  parseDateString(state.date).toLocaleDateString('ru-RU', {
+                  parseDDMMYY(state.date).toLocaleDateString('ru-RU', {
                     day: 'numeric',
                     month: 'long',
                   })}{' '}

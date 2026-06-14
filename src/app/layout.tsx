@@ -20,8 +20,7 @@ export const metadata: Metadata = {
 }
 
 export default async function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
-  const sessionResponse = await getUsersSession().catch(() => null)
-  const user = sessionResponse?.data.success ? sessionResponse.data.user : null
+  const user = (await getUsersSession().catch(() => null))?.data.user
 
   return (
     <html

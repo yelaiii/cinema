@@ -9,7 +9,7 @@ import type { FilmResponse, ScheduleResponse } from '@/api'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Typography } from '@/components/ui/typography'
-import { parseDateString } from '@/utils/parse-date-string'
+import { parseDDMMYY } from '@/utils/parse-date-string'
 
 import type { TimeByHall } from '../../_utils/group-time-by-hall'
 
@@ -35,7 +35,7 @@ export function ScheduleSelector({
       >
         <TabsList className="overflow-x-auto scroll-smooth whitespace-nowrap no-scrollbar -mr-[16px] pr-[20px] md:mr-0 md:pr-[4px] rounded-r-none md:rounded-r-infinite">
           {filmSchedule.data.schedules.map((schedule) => {
-            const date = parseDateString(schedule.date)
+            const date = parseDDMMYY(schedule.date)
 
             return (
               <TabsTrigger
