@@ -98,6 +98,7 @@ export default function ProfilePage() {
           variant="secondary"
           className="w-full"
           type="submit"
+          disabled={!!features.emailField.error}
         >
           Обновить данные
         </Button>

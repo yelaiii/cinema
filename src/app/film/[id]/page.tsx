@@ -10,7 +10,6 @@ import { Badge } from '@/components/ui/badge'
 import { Typography } from '@/components/ui/typography'
 
 import { ScheduleSelector } from './_components/schedule-selector'
-import { groupTimeByHall } from './_utils/group-time-by-hall'
 
 interface Props {
   params: Promise<{ id: string }>
@@ -25,17 +24,27 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export async function generateStaticParams() {
   const films = await getCinemaFilms()
-  return films.data.films.map((film) => ({
-    id: film.id,
-  }))
+  return films.data.films.map((film) => ({ id: film.id }))
 }
+
+export type TimeByHall = Record<string, Record<string, string[]>>
 
 export default async function FilmPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
 
-  const film = await getCinemaFilmByFilmId({ path: { filmId: id } })
-  const filmSchedule = await getCinemaFilmByFilmIdSchedule({ path: { filmId: id } })
-  const timeByHall = groupTimeByHall(filmSchedule)
+  const filmResponse = await getCinemaFilmByFilmId({ path: { filmId: id } })
+  const film = filmResponse.data.film
+  const filmScheduleResponse = await getCinemaFilmByFilmIdSchedule({ path: { filmId: id } })
+  const filmSchedules = filmScheduleResponse.data.schedules
+
+  const timeByHall: TimeByHall = {}
+
+  filmSchedules.forEach((schedule) => {
+    timeByHall[schedule.date] ??= {}
+    schedule.seances.forEach((seance) => {
+      ;(timeByHall[schedule.date][seance.hall.name] ??= []).push(seance.time)
+    })
+  })
 
   return (
     <div>
@@ -53,28 +62,28 @@ export default async function FilmPage({ params }: { params: Promise<{ id: strin
             <Image
               alt="Film poster"
               loading="eager"
-              src={`/api${film.data.film.img}`}
+              src={`/api${film.img}`}
               fill
               className="object-cover rounded-24"
             />
             <Badge type="special" className="absolute top-[16px] left-[16px] z-10">
-              {film.data.film.userRatings.imdb}
+              {film.userRatings.imdb}
             </Badge>
           </div>
           <div className="mt-[8px]">
             <Typography tag="h2" variant="body-lg">
-              {film.data.film.name}
+              {film.name}
             </Typography>
             <Typography tag="p" variant="caption" className="text-surface">
-              {formatGenres(film.data.film.genres)}
+              {formatGenres(film.genres)}
             </Typography>
           </div>
           <Typography variant="body-sm" className="mt-[16px]">
-            {film.data.film.description}
+            {film.description}
           </Typography>
         </div>
 
-        <ScheduleSelector film={film} filmSchedule={filmSchedule} timeByHall={timeByHall} />
+        <ScheduleSelector film={film} schedules={filmSchedules} timeByHall={timeByHall} />
       </div>
     </div>
   )

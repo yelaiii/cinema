@@ -1,3 +1,7 @@
+allowBuilds:
+  lefthook: true
+  sharp: true
+
 ignoredBuiltDependencies:
   - sharp
   - unrs-resolver

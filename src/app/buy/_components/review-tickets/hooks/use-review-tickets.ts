@@ -1,30 +1,31 @@
-import { parseAsJson, parseAsStringLiteral, useQueryState } from 'nuqs'
+import { useUrlSearchParams } from '@siberiacancode/reactuse'
+
+import type { BuyTicketSearchParams } from '@/app/buy/_types'
 
 import { BuyTicketsStep } from '@/app/buy/_types'
 
-import type { HallSeat } from '../../pick-seats'
+const reviewTicketsDefaultValue: BuyTicketSearchParams = {
+  filmName: '',
+  seats: [],
+  date: '',
+  time: '',
+  hallName: '',
+  fullPrice: 0,
+}
 
 export function useReviewTickets() {
-  const [_step, setStep] = useQueryState(
-    'step',
-    parseAsStringLiteral(Object.values(BuyTicketsStep)).withDefault(BuyTicketsStep['Pick-seats']),
-  )
-  const [filmName] = useQueryState('filmName')
-  const [seats] = useQueryState(
-    'seats',
-    parseAsJson((val) => val as HallSeat[]),
-  )
-  const [date] = useQueryState('date')
-  const [time] = useQueryState('time')
-  const [hallName] = useQueryState('hallName')
-  const [fullPrice] = useQueryState('fullPrice')
+  const urlSearchParams = useUrlSearchParams<BuyTicketSearchParams>({
+    initialValue: reviewTicketsDefaultValue,
+  })
 
-  const handleBack = async () => {
-    await setStep(BuyTicketsStep['Pick-seats'])
+  const { filmName, seats, date, time, hallName, fullPrice } = urlSearchParams.value
+
+  const handleBack = () => {
+    urlSearchParams.set({ step: BuyTicketsStep.PickSeats })
   }
 
-  const handleNext = async () => {
-    await setStep(BuyTicketsStep.Contacts)
+  const handleNext = () => {
+    urlSearchParams.set({ step: BuyTicketsStep.Contacts })
   }
 
   return {

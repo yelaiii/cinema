@@ -1,7 +1,7 @@
 import { getCinemaOrders } from '@/api'
+import { parseDDMMYY } from '@/app/_utils/parse-date-string'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Typography } from '@/components/ui/typography'
-import { parseDDMMYY } from '@/utils/parse-date-string'
 
 import { TicketCard } from './_components/ticket-card'
 

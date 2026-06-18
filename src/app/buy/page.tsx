@@ -2,7 +2,9 @@
 
 import type { JSX } from 'react'
 
-import { parseAsStringLiteral, useQueryState } from 'nuqs'
+import { useUrlSearchParams } from '@siberiacancode/reactuse'
+
+import type { BuyTicketSearchParams } from './_types'
 
 import { Contacts } from './_components/contacts'
 import { Pay } from './_components/pay'
@@ -19,11 +21,16 @@ const STEPS: Record<BuyTicketsStep, () => JSX.Element> = {
   payed: Payed,
 }
 
+const buyPageDefaultValue: BuyTicketSearchParams = {
+  step: BuyTicketsStep.PickSeats,
+}
+
 export default function BuyTicketPage() {
-  const [step] = useQueryState(
-    'step',
-    parseAsStringLiteral(Object.values(BuyTicketsStep)).withDefault(BuyTicketsStep['Pick-seats']),
-  )
+  const urlSearchParams = useUrlSearchParams<BuyTicketSearchParams>({
+    initialValue: buyPageDefaultValue,
+  })
+
+  const step = urlSearchParams.value.step!
 
   const Component = STEPS[step]
 

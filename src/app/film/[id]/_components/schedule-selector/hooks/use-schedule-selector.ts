@@ -1,35 +1,46 @@
-import type { ApicraftFetchesResponse } from '@siberiacancode/apicraft'
 import type { MouseEvent } from 'react'
 
+import { useUrlSearchParams } from '@siberiacancode/reactuse'
 import { useParams, useRouter } from 'next/navigation'
-import { useQueryState } from 'nuqs'
 
-import type { FilmResponse, ScheduleResponse } from '@/api'
+import type { FilmResponse } from '@/api'
 
 import { BuyTicketsStep } from '@/app/buy/_types'
 
-export function useScheduleSelector(
-  film: ApicraftFetchesResponse<FilmResponse>,
-  filmSchedule: ApicraftFetchesResponse<ScheduleResponse>,
-) {
+export function useScheduleSelector({
+  film,
+  defaultTime,
+}: {
+  film: FilmResponse['film']
+  defaultTime: string
+}) {
   const router = useRouter()
 
   const { id } = useParams<{ id: string }>()
-  const [date, setDate] = useQueryState('date', {
-    defaultValue: filmSchedule.data.schedules[0].date,
-  })
-  const [time, setTime] = useQueryState('time')
-  const [hallName, setHallName] = useQueryState('hallName')
 
-  const handleDateChange = async (value: string) => {
-    await setDate(value)
-    await setHallName(null)
-    await setTime(null)
+  const urlSearchParams = useUrlSearchParams({
+    initialValue: {
+      date: defaultTime,
+      time: '',
+      hallName: '',
+    },
+  })
+
+  const { date, time, hallName } = urlSearchParams.value
+
+  const handleDateChange = (value: string) => {
+    urlSearchParams.set({
+      date: value,
+      hallName: undefined,
+      time: undefined,
+    })
   }
 
-  const handleTimeChange = async (hallName: string, time: string) => {
-    await setHallName(hallName)
-    await setTime(time)
+  const handleTimeChange = (hallName: string, time: string) => {
+    urlSearchParams.set({
+      hallName,
+      time,
+    })
   }
 
   const handleTabClick = (event: MouseEvent<HTMLButtonElement>) => {
@@ -48,8 +59,8 @@ export function useScheduleSelector(
       time,
       hallName,
       filmId: id,
-      step: BuyTicketsStep['Pick-seats'],
-      filmName: film.data.film.name,
+      step: BuyTicketsStep.PickSeats,
+      filmName: film.name,
     }).toString()
     router.push(`/buy/?${searchParams}`)
   }

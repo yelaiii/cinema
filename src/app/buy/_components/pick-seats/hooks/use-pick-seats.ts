@@ -1,38 +1,37 @@
-import { useQuery } from '@siberiacancode/reactuse'
+import { useQuery, useUrlSearchParams } from '@siberiacancode/reactuse'
 import { useRouter } from 'next/navigation'
-import { parseAsJson, parseAsStringLiteral, parseAsInteger, useQueryState } from 'nuqs'
 import { useMemo } from 'react'
+
+import type { BuyTicketSearchParams } from '@/app/buy/_types'
 
 import { getCinemaFilmByFilmIdSchedule } from '@/api'
 import { BuyTicketsStep } from '@/app/buy/_types'
 
-import type { HallSeat } from '../pick-seats'
+const pickSeatsDefaultValue: BuyTicketSearchParams = {
+  seats: [],
+  filmId: '',
+  date: '',
+  time: '',
+  hallName: '',
+  fullPrice: 0,
+}
 
 export function usePickSeats() {
   const router = useRouter()
+  const urlSearchParams = useUrlSearchParams<BuyTicketSearchParams>({
+    initialValue: pickSeatsDefaultValue,
+  })
 
-  const [_step, setStep] = useQueryState(
-    'step',
-    parseAsStringLiteral(Object.values(BuyTicketsStep)).withDefault(BuyTicketsStep['Pick-seats']),
-  )
-  const [selectedSeats, setSelectedSeats] = useQueryState(
-    'seats',
-    parseAsJson((val) => val as HallSeat[]).withDefault([]),
-  )
+  const {
+    seats: selectedSeats = [],
+    filmId,
+    date,
+    time,
+    hallName,
+    fullPrice = 0,
+  } = urlSearchParams.value
 
-  const [filmId] = useQueryState('filmId')
-  const [date] = useQueryState('date')
-  const [time] = useQueryState('time')
-  const [hallName] = useQueryState('hallName')
-  const [_fullPrice, setFullPrice] = useQueryState('fullPrice', parseAsInteger.withDefault(0))
-
-  const scheduleQuery = useQuery(
-    () => getCinemaFilmByFilmIdSchedule({ path: { filmId: filmId! } }),
-    {
-      keys: [filmId],
-      enabled: !!filmId,
-    },
-  )
+  const scheduleQuery = useQuery(() => getCinemaFilmByFilmIdSchedule({ path: { filmId: filmId! } }))
 
   const seats = useMemo(() => {
     if (!scheduleQuery.data) return undefined
@@ -41,23 +40,27 @@ export function usePickSeats() {
     return seance?.hall.places
   }, [scheduleQuery.data, date, time, hallName])
 
-  const handleSeatClick = async (row: number, column: number) => {
+  const handleSeatClick = (row: number, column: number) => {
     if (!seats) return
     const seat = seats[row]?.[column]
     if (!seat || seat.type === 'BLOCKED') return
 
     const isSelected = selectedSeats.some((s) => s.row === row && s.column === column)
     if (isSelected) {
-      await setSelectedSeats(selectedSeats.filter((s) => !(s.row === row && s.column === column)))
-      await setFullPrice((prev) => Math.max(0, prev - seat.price))
+      urlSearchParams.set({
+        seats: selectedSeats.filter((s) => !(s.row === row && s.column === column)),
+        fullPrice: Math.max(0, fullPrice - seat.price),
+      })
     } else {
-      await setSelectedSeats([...selectedSeats, { row, column }])
-      await setFullPrice((prev) => prev + seat.price)
+      urlSearchParams.set({
+        seats: [...selectedSeats, { row, column }],
+        fullPrice: fullPrice + seat.price,
+      })
     }
   }
 
-  const handleNext = async () => {
-    await setStep(BuyTicketsStep['Review-tickets'])
+  const handleNext = () => {
+    urlSearchParams.set({ step: BuyTicketsStep.ReviewTickets })
   }
 
   const handleBack = () => {

@@ -35,10 +35,7 @@ export function Pay() {
           <FieldLabel>Номер карты*</FieldLabel>
           <Input
             {...features.panField.register({
-              pattern: {
-                value: /^(?: *\d){16} *$/,
-                message: 'Неверный формат карты',
-              },
+              pattern: { value: /^(?: *\d){16} *$/, message: 'Неверный формат карты' },
             })}
             placeholder="0000 0000 0000 0000"
             aria-invalid={!!features.panField.error}
@@ -50,10 +47,7 @@ export function Pay() {
           <FieldLabel>Срок действия*</FieldLabel>
           <Input
             {...features.expireDateField.register({
-              pattern: {
-                value: /^(0[1-9]|1[0-2])\/\d{2}$/,
-                message: 'Формат должен быть ММ/ГГ',
-              },
+              pattern: { value: /^(0[1-9]|1[0-2])\/\d{2}$/, message: 'Формат должен быть ММ/ГГ' },
             })}
             placeholder="00/00"
             aria-invalid={!!features.expireDateField.error}
@@ -67,10 +61,7 @@ export function Pay() {
           <FieldLabel>CVV*</FieldLabel>
           <Input
             {...features.cvvField.register({
-              pattern: {
-                value: /^\d{3}$/,
-                message: 'CVV должен состоять из 3 цифр',
-              },
+              pattern: { value: /^\d{3}$/, message: 'CVV должен состоять из 3 цифр' },
             })}
             placeholder="000"
             type="password"

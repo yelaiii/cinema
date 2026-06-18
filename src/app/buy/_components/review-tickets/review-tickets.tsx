@@ -2,9 +2,9 @@
 
 import { ChevronLeft, TicketIcon } from 'lucide-react'
 
+import { parseDDMMYY } from '@/app/_utils/parse-date-string'
 import { Button } from '@/components/ui/button'
 import { Typography } from '@/components/ui/typography'
-import { parseDDMMYY } from '@/utils/parse-date-string'
 
 import { useReviewTickets } from './hooks/use-review-tickets'
 

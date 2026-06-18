@@ -1,33 +1,25 @@
-import { useField, useMutation } from '@siberiacancode/reactuse'
-import { parseAsJson, parseAsStringLiteral, useQueryState } from 'nuqs'
+import { useField, useMutation, useUrlSearchParams } from '@siberiacancode/reactuse'
+
+import type { BuyTicketSearchParams } from '@/app/buy/_types'
 
 import { postCinemaPayment } from '@/api'
 import { BuyTicketsStep } from '@/app/buy/_types'
 
-import type { HallSeat } from '../../pick-seats'
+const payDefaultValue: BuyTicketSearchParams = {
+  filmId: '',
+  date: '',
+  time: '',
+  seats: [],
+  firstName: '',
+  lastName: '',
+  middleName: '',
+  phone: '',
+}
 
 export function usePay() {
-  const [_step, setStep] = useQueryState(
-    'step',
-    parseAsStringLiteral(Object.values(BuyTicketsStep)).withDefault(BuyTicketsStep['Pick-seats']),
-  )
-
-  const [filmId] = useQueryState('filmId')
-  const [date] = useQueryState('date')
-  const [time] = useQueryState('time')
-  const [seats] = useQueryState(
-    'seats',
-    parseAsJson((val) => val as HallSeat[]),
-  )
-
-  const [lastName] = useQueryState('lastName')
-  const [firstName] = useQueryState('firstName')
-  const [middleName] = useQueryState('middleName')
-  const [phone] = useQueryState('phone')
-  const [_ticketIds, setTicketIds] = useQueryState(
-    'ticketIds',
-    parseAsJson((val) => val as string[]),
-  )
+  const urlSearchParams = useUrlSearchParams<BuyTicketSearchParams>({
+    initialValue: payDefaultValue,
+  })
 
   const panField = useField('', { validateOnChange: true })
   const expireDateField = useField('', { validateOnChange: true })
@@ -35,14 +27,17 @@ export function usePay() {
 
   const paymentMutation = useMutation(postCinemaPayment)
 
-  const handleBack = async () => {
-    await setStep(BuyTicketsStep.Contacts)
+  const handleBack = () => {
+    urlSearchParams.set({ step: BuyTicketsStep.Contacts })
   }
 
   const handleNext = async () => {
     panField.clearError()
     expireDateField.clearError()
     cvvField.clearError()
+
+    const { filmId, date, time, seats, firstName, lastName, middleName, phone } =
+      urlSearchParams.value
 
     if (!filmId || !date || !time || !seats || !firstName || !lastName || !middleName || !phone)
       return
@@ -54,12 +49,12 @@ export function usePay() {
           firstname: firstName,
           lastname: lastName,
           middlename: middleName,
-          phone: phone,
+          phone,
         },
         debitCard: {
-          pan: panField.getValue().replaceAll(' ', ''),
-          expireDate: expireDateField.getValue().replaceAll(' ', ''),
-          cvv: cvvField.getValue().replaceAll(' ', ''),
+          pan: panField.getValue().trim(),
+          expireDate: expireDateField.getValue().trim(),
+          cvv: cvvField.getValue().trim(),
         },
         seance: {
           date,
@@ -71,8 +66,10 @@ export function usePay() {
 
     if (paymentResponse.data.order.status === 'PAYED') {
       const ids = paymentResponse.data.order.tickets.map((t) => t._id)
-      await setTicketIds(ids)
-      await setStep(BuyTicketsStep.Payed)
+      urlSearchParams.set({
+        ticketIds: ids,
+        step: BuyTicketsStep.Payed,
+      })
     }
   }
 

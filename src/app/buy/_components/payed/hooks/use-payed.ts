@@ -1,23 +1,24 @@
+import { useUrlSearchParams } from '@siberiacancode/reactuse'
 import { useRouter } from 'next/navigation'
-import { parseAsJson, useQueryState } from 'nuqs'
 
-import type { HallSeat } from '../../pick-seats'
+import type { BuyTicketSearchParams } from '@/app/buy/_types'
+
+const payedDefaultValue: BuyTicketSearchParams = {
+  filmName: '',
+  seats: [],
+  date: '',
+  time: '',
+  hallName: '',
+  ticketIds: [],
+}
 
 export function usePayed() {
   const router = useRouter()
+  const urlSearchParams = useUrlSearchParams<BuyTicketSearchParams>({
+    initialValue: payedDefaultValue,
+  })
 
-  const [filmName] = useQueryState('filmName')
-  const [seats] = useQueryState(
-    'seats',
-    parseAsJson((val) => val as HallSeat[]),
-  )
-  const [date] = useQueryState('date')
-  const [time] = useQueryState('time')
-  const [hallName] = useQueryState('hallName')
-  const [ticketIds] = useQueryState(
-    'ticketIds',
-    parseAsJson((val) => val as string[]),
-  )
+  const { filmName, seats, date, time, hallName, ticketIds } = urlSearchParams.value
 
   const formattedSeats = (() => {
     if (!seats?.length) return ''
@@ -40,7 +41,7 @@ export function usePayed() {
       .join('; ')
   })()
 
-  const formattedTicketIds = ticketIds!.map((id) => id.slice(0, 5)).join(', ')
+  const formattedTicketIds = ticketIds ? ticketIds.map((id) => id.slice(0, 5)).join(', ') : ''
 
   const handleGoToDetails = () => {
     router.push('/tickets')

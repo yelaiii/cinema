@@ -7,7 +7,7 @@ export const revalidate = 86400
 
 export default async function HomePage() {
   const filmsResponse = await getCinemaFilms()
-  const { films } = filmsResponse.data
+  const films = filmsResponse.data.films
 
   return (
     <div>

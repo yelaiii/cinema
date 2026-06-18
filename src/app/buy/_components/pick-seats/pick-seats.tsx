@@ -70,8 +70,8 @@ export function PickSeats() {
                               className,
                               'w-[24px] h-[24px] rounded-[4px] bg-neutral-300 disabled:cursor-auto cursor-pointer disabled:bg-neutral-900 data-[selected]:bg-pink-200 shrink-0',
                             )}
-                            onClick={async (event) => {
-                              await functions.handleSeatClick(i, j)
+                            onClick={(event) => {
+                              functions.handleSeatClick(i, j)
                               onClick?.(event)
                             }}
                           />

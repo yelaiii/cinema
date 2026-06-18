@@ -2,9 +2,9 @@
 
 import { Check } from 'lucide-react'
 
+import { parseDDMMYY } from '@/app/_utils/parse-date-string'
 import { Button } from '@/components/ui/button'
 import { Typography } from '@/components/ui/typography'
-import { parseDDMMYY } from '@/utils/parse-date-string'
 
 import { usePayed } from './hooks/use-payed'
 

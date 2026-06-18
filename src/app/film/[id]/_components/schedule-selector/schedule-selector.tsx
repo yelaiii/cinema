@@ -1,56 +1,50 @@
 'use client'
 
-import type { ApicraftFetchesResponse } from '@siberiacancode/apicraft'
-
 import { XIcon } from 'lucide-react'
 
 import type { FilmResponse, ScheduleResponse } from '@/api'
 
+import { parseDDMMYY } from '@/app/_utils/parse-date-string'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Typography } from '@/components/ui/typography'
-import { parseDDMMYY } from '@/utils/parse-date-string'
 
-import type { TimeByHall } from '../../_utils/group-time-by-hall'
+import type { TimeByHall } from '../../page'
 
 import { useScheduleSelector } from './hooks/use-schedule-selector'
 
 export function ScheduleSelector({
   film,
-  filmSchedule,
+  schedules,
   timeByHall,
 }: {
-  film: ApicraftFetchesResponse<FilmResponse>
-  filmSchedule: ApicraftFetchesResponse<ScheduleResponse>
+  film: FilmResponse['film']
+  schedules: ScheduleResponse['schedules']
   timeByHall: TimeByHall
 }) {
-  const { state, functions } = useScheduleSelector(film, filmSchedule)
+  const { state, functions } = useScheduleSelector({ film, defaultTime: schedules[0].date })
 
   return (
     <div className="mt-[24px] flex flex-col gap-[24px]">
       <Tabs
-        defaultValue={filmSchedule.data.schedules[0].date}
+        defaultValue={schedules[0].date}
         value={state.date}
         onValueChange={functions.handleDateChange}
       >
         <TabsList className="overflow-x-auto scroll-smooth whitespace-nowrap no-scrollbar -mr-[16px] pr-[20px] md:mr-0 md:pr-[4px] rounded-r-none md:rounded-r-infinite">
-          {filmSchedule.data.schedules.map((schedule) => {
-            const date = parseDDMMYY(schedule.date)
-
-            return (
-              <TabsTrigger
-                key={schedule.date}
-                value={schedule.date}
-                onClick={functions.handleTabClick}
-              >
-                {date.toLocaleDateString('ru-RU', {
-                  day: 'numeric',
-                  month: 'short',
-                  weekday: 'short',
-                })}
-              </TabsTrigger>
-            )
-          })}
+          {schedules.map((schedule) => (
+            <TabsTrigger
+              key={schedule.date}
+              value={schedule.date}
+              onClick={functions.handleTabClick}
+            >
+              {parseDDMMYY(schedule.date).toLocaleDateString('ru-RU', {
+                day: 'numeric',
+                month: 'short',
+                weekday: 'short',
+              })}
+            </TabsTrigger>
+          ))}
         </TabsList>
       </Tabs>
 

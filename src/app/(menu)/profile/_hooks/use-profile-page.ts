@@ -34,9 +34,6 @@ export function useProfilePage() {
 
   const handleUpdateProfile: SubmitEventHandler<HTMLFormElement> = (event) => {
     event.preventDefault()
-
-    if (emailField.error || !user) return
-
     updateProfileMutation.mutate({
       body: {
         phone: user.phone,

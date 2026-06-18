@@ -16,16 +16,15 @@ export function useAuthPage() {
 
     try {
       await createOtpMutation.mutateAsync({
-        body: {
-          phone: phoneField.getValue(),
-        },
+        body: { phone: phoneField.getValue() },
       })
 
       const url = new URL('/auth/otp', window.location.origin)
+
+      const redirect = searchParams.get('redirect')
+      if (redirect) url.searchParams.set('redirect', redirect)
+
       url.searchParams.set('phone', phoneField.getValue())
-      if (searchParams.get('redirect')) {
-        url.searchParams.set('redirect', searchParams.get('redirect')!)
-      }
 
       router.push(url.toString())
     } catch {}

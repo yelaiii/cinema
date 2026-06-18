@@ -4,8 +4,6 @@ import type { ReactNode } from 'react'
 import { Nunito } from 'next/font/google'
 
 import '@/assets/styles/globals.css'
-import { NuqsAdapter } from 'nuqs/adapters/next/app'
-
 import { getUsersSession } from '@/api'
 import { UserProvider } from '@/app/_contexts/user-context'
 import { cn } from '@/utils/cn'
@@ -31,9 +29,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
       )}
     >
       <body className="relative h-full p-[16px]! md:px-[120px] md:py-[64px] xl:max-w-[1440px] mx-auto my-0">
-        <NuqsAdapter>
-          <UserProvider user={user}>{children}</UserProvider>
-        </NuqsAdapter>
+        <UserProvider user={user}>{children}</UserProvider>
       </body>
     </html>
   )
