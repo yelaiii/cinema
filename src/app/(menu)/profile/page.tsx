@@ -24,70 +24,72 @@ export default function ProfilePage() {
       <form
         id="profile-form"
         className="py-[24px] flex flex-col gap-[16px]"
-        onSubmit={functions.handleUpdateProfile}
+        onSubmit={features.profileForm.handleSubmit(functions.handleUpdateProfile)}
       >
         <Field>
           <FieldLabel>Фамилия</FieldLabel>
           <Input
-            {...features.lastNameField.register()}
+            {...features.profileForm.register('lastName')}
             placeholder="Иванов"
-            aria-invalid={!!features.lastNameField.error}
+            aria-invalid={!!features.profileForm.formState.errors.lastName}
           />
-          {features.lastNameField.error && <FieldError>{features.lastNameField.error}</FieldError>}
+          {features.profileForm.formState.errors.lastName?.message && (
+            <FieldError>{features.profileForm.formState.errors.lastName.message}</FieldError>
+          )}
         </Field>
 
         <Field>
           <FieldLabel>Имя</FieldLabel>
           <Input
-            {...features.firstNameField.register()}
+            {...features.profileForm.register('firstName')}
             placeholder="Иван"
-            aria-invalid={!!features.firstNameField.error}
+            aria-invalid={!!features.profileForm.formState.errors.firstName}
           />
-          {features.firstNameField.error && (
-            <FieldError>{features.firstNameField.error}</FieldError>
+          {features.profileForm.formState.errors.firstName?.message && (
+            <FieldError>{features.profileForm.formState.errors.firstName.message}</FieldError>
           )}
         </Field>
 
         <Field>
           <FieldLabel>Отчество</FieldLabel>
           <Input
-            {...features.middleNameField.register()}
+            {...features.profileForm.register('middleName')}
             placeholder="Иванович"
-            aria-invalid={!!features.middleNameField.error}
+            aria-invalid={!!features.profileForm.formState.errors.middleName}
           />
-          {features.middleNameField.error && (
-            <FieldError>{features.middleNameField.error}</FieldError>
+          {features.profileForm.formState.errors.middleName?.message && (
+            <FieldError>{features.profileForm.formState.errors.middleName.message}</FieldError>
           )}
         </Field>
 
         <Field>
           <FieldLabel>Город</FieldLabel>
           <Input
-            {...features.cityField.register()}
+            {...features.profileForm.register('city')}
             placeholder="Мюнхен"
-            aria-invalid={!!features.cityField.error}
+            aria-invalid={!!features.profileForm.formState.errors.city}
           />
-          {features.cityField.error && <FieldError>{features.cityField.error}</FieldError>}
+          {features.profileForm.formState.errors.city?.message && (
+            <FieldError>{features.profileForm.formState.errors.city.message}</FieldError>
+          )}
         </Field>
 
         <Field>
           <FieldLabel>Телефон</FieldLabel>
-          <Input value={state.user!.phone} disabled />
+          <Input value={state.user?.phone ?? ''} disabled />
         </Field>
 
         <Field>
           <FieldLabel>Email</FieldLabel>
           <Input
-            {...features.emailField.register({
-              pattern: {
-                value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
-                message: 'Некорректный email',
-              },
-            })}
+            type="email"
+            {...features.profileForm.register('email')}
             placeholder="Email"
-            aria-invalid={!!features.emailField.error}
+            aria-invalid={!!features.profileForm.formState.errors.email}
           />
-          {features.emailField.error && <FieldError>{features.emailField.error}</FieldError>}
+          {features.profileForm.formState.errors.email?.message && (
+            <FieldError>{features.profileForm.formState.errors.email.message}</FieldError>
+          )}
         </Field>
       </form>
 
@@ -98,7 +100,6 @@ export default function ProfilePage() {
           variant="secondary"
           className="w-full"
           type="submit"
-          disabled={!!features.emailField.error}
         >
           Обновить данные
         </Button>

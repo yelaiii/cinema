@@ -13,7 +13,7 @@ export function Contacts() {
   const { functions, features } = useContacts()
 
   return (
-    <div>
+    <form onSubmit={functions.handleNext}>
       <div className="md:hidden h-[56px] gap-[16px] flex items-center">
         <ChevronLeft className="cursor-pointer" onClick={functions.handleBack} tabIndex={0} />
         <Typography tag="h1" variant="title-md">
@@ -33,93 +33,92 @@ export function Contacts() {
         <Field>
           <FieldLabel>Фамилия</FieldLabel>
           <Input
-            {...features.lastNameField.register()}
+            {...features.contactsForm.register('lastName')}
             placeholder="Иванов"
-            aria-invalid={!!features.lastNameField.error}
+            required
+            aria-invalid={!!features.contactsForm.formState.errors.lastName}
           />
-          {features.lastNameField.error && <FieldError>{features.lastNameField.error}</FieldError>}
+          {!!features.contactsForm.formState.errors.lastName && (
+            <FieldError>{features.contactsForm.formState.errors.lastName.message}</FieldError>
+          )}
         </Field>
 
         <Field>
           <FieldLabel>Имя</FieldLabel>
           <Input
-            {...features.firstNameField.register()}
+            {...features.contactsForm.register('firstName')}
             placeholder="Иван"
-            aria-invalid={!!features.firstNameField.error}
+            required
+            aria-invalid={!!features.contactsForm.formState.errors.firstName}
           />
-          {features.firstNameField.error && (
-            <FieldError>{features.firstNameField.error}</FieldError>
+          {!!features.contactsForm.formState.errors.firstName && (
+            <FieldError>{features.contactsForm.formState.errors.firstName.message}</FieldError>
           )}
         </Field>
 
         <Field>
           <FieldLabel>Отчество</FieldLabel>
           <Input
-            {...features.middleNameField.register()}
+            {...features.contactsForm.register('middleName')}
             placeholder="Иванович"
-            aria-invalid={!!features.middleNameField.error}
+            required
+            aria-invalid={!!features.contactsForm.formState.errors.middleName}
           />
-          {features.middleNameField.error && (
-            <FieldError>{features.middleNameField.error}</FieldError>
+          {!!features.contactsForm.formState.errors.middleName && (
+            <FieldError>{features.contactsForm.formState.errors.middleName.message}</FieldError>
           )}
         </Field>
 
         <Field>
           <FieldLabel>Город</FieldLabel>
           <Input
-            {...features.cityField.register()}
+            {...features.contactsForm.register('city')}
             placeholder="Мюнхен"
-            aria-invalid={!!features.cityField.error}
+            required
+            aria-invalid={!!features.contactsForm.formState.errors.city}
           />
-          {features.cityField.error && <FieldError>{features.cityField.error}</FieldError>}
+          {!!features.contactsForm.formState.errors.city && (
+            <FieldError>{features.contactsForm.formState.errors.city.message}</FieldError>
+          )}
         </Field>
 
         <Field>
           <FieldLabel>Телефон</FieldLabel>
           <Input
-            {...features.phoneField.register({
-              pattern: {
-                value: /^(\+?\d{1,3})?[-.\s]?(\(?\d{3}\)?)[-.\s]?\d{3}[-.\s]?\d{2,4}$/,
-                message: 'Неверный номер телефона',
-              },
-            })}
+            type="tel"
+            {...features.contactsForm.register('phone')}
             placeholder="+1"
-            aria-invalid={!!features.phoneField.error}
+            required
+            aria-invalid={!!features.contactsForm.formState.errors.phone}
           />
-          {features.phoneField.error && <FieldError>{features.phoneField.error}</FieldError>}
+          {!!features.contactsForm.formState.errors.phone && (
+            <FieldError>{features.contactsForm.formState.errors.phone.message}</FieldError>
+          )}
         </Field>
 
         <Field>
           <FieldLabel>Email</FieldLabel>
           <Input
-            {...features.emailField.register({
-              pattern: {
-                value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
-                message: 'Некорректный email',
-              },
-            })}
+            type="email"
+            {...features.contactsForm.register('email')}
+            required
             placeholder="Email"
-            aria-invalid={!!features.emailField.error}
+            aria-invalid={!!features.contactsForm.formState.errors.email}
           />
-          {features.emailField.error && <FieldError>{features.emailField.error}</FieldError>}
+          {!!features.contactsForm.formState.errors.email && (
+            <FieldError>{features.contactsForm.formState.errors.email.message}</FieldError>
+          )}
         </Field>
       </div>
 
       <Button
-        onClick={functions.handleNext}
-        disabled={
-          !features.lastNameField ||
-          !features.firstNameField ||
-          !features.middleNameField ||
-          !features.cityField ||
-          !features.phoneField ||
-          !features.emailField
-        }
+        type="submit"
+        disabled={!features.contactsForm.formState.isValid}
         size="large"
         className="w-[unset] bottom-[20px] right-[20px] left-[20px] fixed"
       >
         Продолжить
       </Button>
-    </div>
+    </form>
   )
 }

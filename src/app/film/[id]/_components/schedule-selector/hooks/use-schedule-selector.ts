@@ -1,45 +1,45 @@
 import type { MouseEvent } from 'react'
 
-import { useUrlSearchParams } from '@siberiacancode/reactuse'
 import { useParams, useRouter } from 'next/navigation'
+import { parseAsString, useQueryStates } from 'nuqs'
 
 import type { FilmResponse } from '@/api'
 
-import { BuyTicketsStep } from '@/app/buy/_types'
+import { BUY_URL_PARAMS, BuyTicketsStep } from '@/app/buy/_constants'
 
 export function useScheduleSelector({
   film,
-  defaultTime,
+  defaultDate,
 }: {
   film: FilmResponse['film']
-  defaultTime: string
+  defaultDate: string
 }) {
   const router = useRouter()
 
   const { id } = useParams<{ id: string }>()
 
-  const urlSearchParams = useUrlSearchParams({
-    initialValue: {
-      date: defaultTime,
-      time: '',
-      hallName: '',
-    },
+  const [query, setQuery] = useQueryStates({
+    [BUY_URL_PARAMS.DATE]: parseAsString,
+    [BUY_URL_PARAMS.TIME]: parseAsString,
+    [BUY_URL_PARAMS.HALL_NAME]: parseAsString,
   })
 
-  const { date, time, hallName } = urlSearchParams.value
+  const date = query[BUY_URL_PARAMS.DATE] || defaultDate
+  const time = query[BUY_URL_PARAMS.TIME] || ''
+  const hallName = query[BUY_URL_PARAMS.HALL_NAME] || ''
 
-  const handleDateChange = (value: string) => {
-    urlSearchParams.set({
-      date: value,
-      hallName: undefined,
-      time: undefined,
+  const handleDateChange = async (value: string) => {
+    await setQuery({
+      [BUY_URL_PARAMS.DATE]: value,
+      [BUY_URL_PARAMS.HALL_NAME]: null,
+      [BUY_URL_PARAMS.TIME]: null,
     })
   }
 
-  const handleTimeChange = (hallName: string, time: string) => {
-    urlSearchParams.set({
-      hallName,
-      time,
+  const handleTimeChange = async (hallName: string, time: string) => {
+    await setQuery({
+      [BUY_URL_PARAMS.HALL_NAME]: hallName,
+      [BUY_URL_PARAMS.TIME]: time,
     })
   }
 
@@ -55,12 +55,12 @@ export function useScheduleSelector({
     if (!date || !time || !hallName) return
 
     const searchParams = new URLSearchParams({
-      date,
-      time,
-      hallName,
-      filmId: id,
-      step: BuyTicketsStep.PickSeats,
-      filmName: film.name,
+      [BUY_URL_PARAMS.DATE]: date,
+      [BUY_URL_PARAMS.TIME]: time,
+      [BUY_URL_PARAMS.HALL_NAME]: hallName,
+      [BUY_URL_PARAMS.FILM_ID]: id,
+      [BUY_URL_PARAMS.STEP]: BuyTicketsStep.PickSeats,
+      [BUY_URL_PARAMS.FILM_NAME]: film.name,
     }).toString()
     router.push(`/buy/?${searchParams}`)
   }

@@ -4,7 +4,7 @@ import { cookies } from 'next/headers'
 
 import { AUTHORIZATION_TOKEN } from '@/app/_constants'
 
-export async function signInAction(authorizationToken: string) {
+export async function setTokenAction(authorizationToken: string) {
   const cookieStore = await cookies()
   cookieStore.set(AUTHORIZATION_TOKEN, authorizationToken, {
     httpOnly: true,

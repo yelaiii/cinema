@@ -2,6 +2,7 @@
 
 import { Popover } from '@base-ui/react/popover'
 import { ChevronLeft, XIcon } from 'lucide-react'
+import { useEffect, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Typography } from '@/components/ui/typography'
@@ -17,6 +18,13 @@ export interface HallSeat {
 
 export function PickSeats() {
   const { state, queries, functions } = usePickSeats()
+  const [isMounted, setIsMounted] = useState(false)
+
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
+
+  const showSkeleton = !isMounted || queries.schedule.isLoading
 
   return (
     <div>
@@ -35,9 +43,9 @@ export function PickSeats() {
         </div>
       </div>
 
-      {queries.schedule.isLoading && <SeatsSkeleton />}
+      {showSkeleton && <SeatsSkeleton />}
 
-      {!queries.schedule.isLoading && state.seats && (
+      {!showSkeleton && state.seats && (
         <div className="mt-[24px] w-full">
           <Typography variant="body-sm">Ряд</Typography>
           <div className="overflow-x-auto scale-y-[-1] py-[12px]">

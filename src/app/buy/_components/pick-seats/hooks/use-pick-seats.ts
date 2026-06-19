@@ -1,35 +1,30 @@
-import { useQuery, useUrlSearchParams } from '@siberiacancode/reactuse'
+import { useQuery } from '@siberiacancode/reactuse'
 import { useRouter } from 'next/navigation'
+import { parseAsFloat, parseAsJson, parseAsString, parseAsStringEnum, useQueryStates } from 'nuqs'
 import { useMemo } from 'react'
 
-import type { BuyTicketSearchParams } from '@/app/buy/_types'
-
 import { getCinemaFilmByFilmIdSchedule } from '@/api'
-import { BuyTicketsStep } from '@/app/buy/_types'
-
-const pickSeatsDefaultValue: BuyTicketSearchParams = {
-  seats: [],
-  filmId: '',
-  date: '',
-  time: '',
-  hallName: '',
-  fullPrice: 0,
-}
+import { BUY_URL_PARAMS, BuyTicketsStep } from '@/app/buy/_constants'
 
 export function usePickSeats() {
   const router = useRouter()
-  const urlSearchParams = useUrlSearchParams<BuyTicketSearchParams>({
-    initialValue: pickSeatsDefaultValue,
+
+  const [query, setQuery] = useQueryStates({
+    [BUY_URL_PARAMS.SEATS]: parseAsJson((v) => v as { row: number; column: number }[]),
+    [BUY_URL_PARAMS.FILM_ID]: parseAsString,
+    [BUY_URL_PARAMS.DATE]: parseAsString,
+    [BUY_URL_PARAMS.TIME]: parseAsString,
+    [BUY_URL_PARAMS.HALL_NAME]: parseAsString,
+    [BUY_URL_PARAMS.FULL_PRICE]: parseAsFloat,
+    [BUY_URL_PARAMS.STEP]: parseAsStringEnum<BuyTicketsStep>(Object.values(BuyTicketsStep)),
   })
 
-  const {
-    seats: selectedSeats = [],
-    filmId,
-    date,
-    time,
-    hallName,
-    fullPrice = 0,
-  } = urlSearchParams.value
+  const selectedSeats = query[BUY_URL_PARAMS.SEATS] ?? []
+  const filmId = query[BUY_URL_PARAMS.FILM_ID]
+  const date = query[BUY_URL_PARAMS.DATE]
+  const time = query[BUY_URL_PARAMS.TIME]
+  const hallName = query[BUY_URL_PARAMS.HALL_NAME]
+  const fullPrice = query[BUY_URL_PARAMS.FULL_PRICE] ?? 0
 
   const scheduleQuery = useQuery(() => getCinemaFilmByFilmIdSchedule({ path: { filmId: filmId! } }))
 
@@ -40,31 +35,33 @@ export function usePickSeats() {
     return seance?.hall.places
   }, [scheduleQuery.data, date, time, hallName])
 
-  const handleSeatClick = (row: number, column: number) => {
+  const handleSeatClick = async (row: number, column: number) => {
     if (!seats) return
     const seat = seats[row]?.[column]
     if (!seat || seat.type === 'BLOCKED') return
 
     const isSelected = selectedSeats.some((s) => s.row === row && s.column === column)
     if (isSelected) {
-      urlSearchParams.set({
-        seats: selectedSeats.filter((s) => !(s.row === row && s.column === column)),
-        fullPrice: Math.max(0, fullPrice - seat.price),
+      await setQuery({
+        [BUY_URL_PARAMS.SEATS]: selectedSeats.filter(
+          (s) => !(s.row === row && s.column === column),
+        ),
+        [BUY_URL_PARAMS.FULL_PRICE]: fullPrice - seat.price,
       })
     } else {
-      urlSearchParams.set({
-        seats: [...selectedSeats, { row, column }],
-        fullPrice: fullPrice + seat.price,
+      await setQuery({
+        [BUY_URL_PARAMS.SEATS]: [...selectedSeats, { row, column }],
+        [BUY_URL_PARAMS.FULL_PRICE]: fullPrice + seat.price,
       })
     }
   }
 
-  const handleNext = () => {
-    urlSearchParams.set({ step: BuyTicketsStep.ReviewTickets })
+  const handleNext = async () => {
+    await setQuery({ [BUY_URL_PARAMS.STEP]: BuyTicketsStep.ReviewTickets })
   }
 
   const handleBack = () => {
-    router.back()
+    router.push(`/film/${filmId}`)
   }
 
   return {

@@ -2,12 +2,15 @@ import { useField, useMutation, useTimer } from '@siberiacancode/reactuse'
 import { useRouter, useSearchParams } from 'next/navigation'
 
 import { postAuthOtp, postUsersSignin } from '@/api'
+import { useUser } from '@/app/_contexts/user'
 
-import { signInAction } from '../_actions/sign-in'
+import { setTokenAction } from '../_actions/sign-in'
 
 export function useOtpPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
+
+  const { setUser } = useUser()
 
   const otpField = useField('', { validateOnChange: true })
 
@@ -19,7 +22,7 @@ export function useOtpPage() {
   const handleSubmit = async () => {
     otpField.clearError()
 
-    const mutation = await signInMutation
+    const signInResponse = await signInMutation
       .mutateAsync({
         body: {
           code: +otpField.getValue(),
@@ -28,22 +31,20 @@ export function useOtpPage() {
       })
       .catch(() => null)
 
-    if (!mutation?.data?.success) return otpField.setError('Неверный код')
+    if (!signInResponse?.data?.success) return otpField.setError('Неверный код')
 
-    await signInAction(mutation.data.token)
+    await setTokenAction(signInResponse.data.token)
+    setUser(signInResponse.data.user)
+
     const url = new URL('/', window.location.origin)
-    if (searchParams.get('redirect')) {
-      url.pathname = `/${searchParams.get('redirect')}`
-    }
+    if (searchParams.get('redirect')) url.pathname = `/${searchParams.get('redirect')}`
     return router.replace(url.toString())
   }
 
   const handleResend = () => {
     resendOtpMutation
       .mutateAsync({
-        body: {
-          phone: searchParams.get('phone')!,
-        },
+        body: { phone: searchParams.get('phone')! },
       })
       .catch(() => null)
   }

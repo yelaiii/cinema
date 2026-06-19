@@ -1,24 +1,21 @@
-import { useUrlSearchParams } from '@siberiacancode/reactuse'
+import { useSearchParams } from 'next/navigation'
 import { useRouter } from 'next/navigation'
 
-import type { BuyTicketSearchParams } from '@/app/buy/_types'
-
-const payedDefaultValue: BuyTicketSearchParams = {
-  filmName: '',
-  seats: [],
-  date: '',
-  time: '',
-  hallName: '',
-  ticketIds: [],
-}
+import { BUY_URL_PARAMS } from '@/app/buy/_constants'
 
 export function usePayed() {
   const router = useRouter()
-  const urlSearchParams = useUrlSearchParams<BuyTicketSearchParams>({
-    initialValue: payedDefaultValue,
-  })
+  const searchParams = useSearchParams()
 
-  const { filmName, seats, date, time, hallName, ticketIds } = urlSearchParams.value
+  const filmName = searchParams.get(BUY_URL_PARAMS.FILM_NAME)
+  const seats = JSON.parse(searchParams.get(BUY_URL_PARAMS.SEATS)!) as {
+    row: number
+    column: number
+  }[]
+  const date = searchParams.get(BUY_URL_PARAMS.DATE)
+  const time = searchParams.get(BUY_URL_PARAMS.TIME)
+  const hallName = searchParams.get(BUY_URL_PARAMS.HALL_NAME)
+  const ticketIds = JSON.parse(searchParams.get(BUY_URL_PARAMS.TICKETS)!) as string[]
 
   const formattedSeats = (() => {
     if (!seats?.length) return ''

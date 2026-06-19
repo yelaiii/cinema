@@ -3,6 +3,7 @@ import type { Metadata } from 'next'
 import { ChevronLeft } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { Suspense } from 'react'
 
 import { getCinemaFilmByFilmId, getCinemaFilmByFilmIdSchedule, getCinemaFilms } from '@/api'
 import { formatGenres } from '@/app/_utils/format-genres'
@@ -83,7 +84,9 @@ export default async function FilmPage({ params }: { params: Promise<{ id: strin
           </Typography>
         </div>
 
-        <ScheduleSelector film={film} schedules={filmSchedules} timeByHall={timeByHall} />
+        <Suspense>
+          <ScheduleSelector film={film} schedules={filmSchedules} timeByHall={timeByHall} />
+        </Suspense>
       </div>
     </div>
   )

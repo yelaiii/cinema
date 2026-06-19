@@ -22,7 +22,7 @@ export function ScheduleSelector({
   schedules: ScheduleResponse['schedules']
   timeByHall: TimeByHall
 }) {
-  const { state, functions } = useScheduleSelector({ film, defaultTime: schedules[0].date })
+  const { state, functions } = useScheduleSelector({ film, defaultDate: schedules[0].date })
 
   return (
     <div className="mt-[24px] flex flex-col gap-[24px]">

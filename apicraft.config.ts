@@ -6,7 +6,7 @@ export default apicraft([
     output: 'generated/api',
     instance: {
       name: 'fetches',
-      runtimeInstancePath: './src/lib/fetches.ts',
+      runtimeInstancePath: './src/lib/fetches',
     },
     nameBy: 'path',
     groupBy: 'tags',

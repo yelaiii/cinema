@@ -6,9 +6,7 @@ import { putCinemaOrdersCancel } from '@/api'
 
 export async function returnTicketAction(orderId: string) {
   await putCinemaOrdersCancel({
-    body: {
-      orderId,
-    },
+    body: { orderId },
   })
   refresh()
 }

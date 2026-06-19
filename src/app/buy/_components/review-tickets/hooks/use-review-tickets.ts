@@ -1,31 +1,32 @@
-import { useUrlSearchParams } from '@siberiacancode/reactuse'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 
-import type { BuyTicketSearchParams } from '@/app/buy/_types'
-
-import { BuyTicketsStep } from '@/app/buy/_types'
-
-const reviewTicketsDefaultValue: BuyTicketSearchParams = {
-  filmName: '',
-  seats: [],
-  date: '',
-  time: '',
-  hallName: '',
-  fullPrice: 0,
-}
+import { BUY_URL_PARAMS, BuyTicketsStep } from '@/app/buy/_constants'
 
 export function useReviewTickets() {
-  const urlSearchParams = useUrlSearchParams<BuyTicketSearchParams>({
-    initialValue: reviewTicketsDefaultValue,
-  })
+  const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
 
-  const { filmName, seats, date, time, hallName, fullPrice } = urlSearchParams.value
+  const filmName = searchParams.get(BUY_URL_PARAMS.FILM_NAME)
+  const seats = JSON.parse(searchParams.get(BUY_URL_PARAMS.SEATS)!) as {
+    row: number
+    column: number
+  }[]
+  const date = searchParams.get(BUY_URL_PARAMS.DATE)
+  const time = searchParams.get(BUY_URL_PARAMS.TIME)
+  const hallName = searchParams.get(BUY_URL_PARAMS.HALL_NAME)
+  const fullPrice = +searchParams.get(BUY_URL_PARAMS.FULL_PRICE)!
 
   const handleBack = () => {
-    urlSearchParams.set({ step: BuyTicketsStep.PickSeats })
+    const params = new URLSearchParams(searchParams.toString())
+    params.set(BUY_URL_PARAMS.STEP, BuyTicketsStep.PickSeats)
+    router.push(`?${params.toString()}`)
   }
 
   const handleNext = () => {
-    urlSearchParams.set({ step: BuyTicketsStep.Contacts })
+    const params = new URLSearchParams(searchParams.toString())
+    params.set(BUY_URL_PARAMS.STEP, BuyTicketsStep.Contacts)
+    router.push(`?${params.toString()}`)
   }
 
   return {

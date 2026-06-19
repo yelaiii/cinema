@@ -1,5 +1,7 @@
 'use client'
 
+import z from 'zod'
+
 import { Button } from '@/components/ui/button'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
@@ -30,10 +32,8 @@ export default function AuthPage() {
             placeholder="+1"
             required
             {...features.phoneField.register({
-              pattern: {
-                value: /^(\+?\d{1,3})?[-.\s]?(\(?\d{3}\)?)[-.\s]?\d{3}[-.\s]?\d{2,4}$/,
-                message: 'Неверный номер телефона',
-              },
+              validate: (value) =>
+                z.e164().safeParse(value).success ? true : 'Неверный номер телефона',
             })}
             aria-invalid={!!features.phoneField.error}
           />

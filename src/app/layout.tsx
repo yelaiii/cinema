@@ -2,10 +2,11 @@ import type { Metadata } from 'next'
 import type { ReactNode } from 'react'
 
 import { Nunito } from 'next/font/google'
+import { NuqsAdapter } from 'nuqs/adapters/next/app'
 
 import '@/assets/styles/globals.css'
 import { getUsersSession } from '@/api'
-import { UserProvider } from '@/app/_contexts/user-context'
+import { UserProvider } from '@/app/_contexts/user'
 import { cn } from '@/utils/cn'
 
 const nunitoSans = Nunito({
@@ -18,7 +19,7 @@ export const metadata: Metadata = {
 }
 
 export default async function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
-  const user = (await getUsersSession().catch(() => null))?.data.user
+  const user = (await getUsersSession().catch(() => null))?.data.user || null
 
   return (
     <html
@@ -29,7 +30,9 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
       )}
     >
       <body className="relative h-full p-[16px]! md:px-[120px] md:py-[64px] xl:max-w-[1440px] mx-auto my-0">
-        <UserProvider user={user}>{children}</UserProvider>
+        <NuqsAdapter>
+          <UserProvider defaultUser={user}>{children}</UserProvider>
+        </NuqsAdapter>
       </body>
     </html>
   )

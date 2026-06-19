@@ -1,25 +1,41 @@
 'use client'
 
-import type { SubmitEventHandler } from 'react'
-
-import { useDisclosure, useField, useMediaQuery, useMutation } from '@siberiacancode/reactuse'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useDisclosure, useMediaQuery, useMutation } from '@siberiacancode/reactuse'
+import { useForm } from 'react-hook-form'
+import z from 'zod'
 
 import { patchUsersProfile } from '@/api'
-import { userContext } from '@/app/_contexts/user-context'
+import { useUser } from '@/app/_contexts/user'
 
 import { logoutAction } from '../_actions/logout'
+
+export const ProfileFormSchema = z.object({
+  lastName: z.string().trim(),
+  firstName: z.string().trim(),
+  middleName: z.string().trim(),
+  city: z.string().trim(),
+  email: z.email('Некорректный email').trim().or(z.literal('')),
+})
+export type ProfileFormSchema = z.infer<typeof ProfileFormSchema>
 
 export function useProfilePage() {
   const logoutDialog = useDisclosure()
   const isDesktop = useMediaQuery('(min-width: 768px)')
 
-  const user = userContext.useSelect((value) => value)!
+  const { user } = useUser()
 
-  const lastNameField = useField(user?.lastname ?? '')
-  const firstNameField = useField(user?.firstname ?? '')
-  const middleNameField = useField(user?.middlename ?? '')
-  const cityField = useField(user?.city ?? '')
-  const emailField = useField(user?.email ?? '', { validateOnChange: true })
+  const profileForm = useForm<ProfileFormSchema>({
+    resolver: zodResolver(ProfileFormSchema),
+    mode: 'all',
+    values: {
+      lastName: user?.lastname ?? '',
+      firstName: user?.firstname ?? '',
+      middleName: user?.middlename ?? '',
+      city: user?.city ?? '',
+      email: user?.email ?? '',
+    },
+  })
 
   const updateProfileMutation = useMutation(patchUsersProfile)
 
@@ -32,17 +48,16 @@ export function useProfilePage() {
     window.location.href = '/'
   }
 
-  const handleUpdateProfile: SubmitEventHandler<HTMLFormElement> = (event) => {
-    event.preventDefault()
+  const handleUpdateProfile = (values: ProfileFormSchema) => {
     updateProfileMutation.mutate({
       body: {
-        phone: user.phone,
+        phone: user!.phone,
         profile: {
-          firstname: firstNameField.getValue(),
-          lastname: lastNameField.getValue(),
-          middlename: middleNameField.getValue(),
-          city: cityField.getValue(),
-          email: emailField.getValue(),
+          firstname: values.firstName.trim(),
+          lastname: values.lastName.trim(),
+          middlename: values.middleName.trim(),
+          city: values.city.trim(),
+          email: values.email.trim(),
         },
       },
     })
@@ -60,11 +75,7 @@ export function useProfilePage() {
     },
     features: {
       logoutDialog,
-      lastNameField,
-      firstNameField,
-      middleNameField,
-      cityField,
-      emailField,
+      profileForm,
     },
   }
 }

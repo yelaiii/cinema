@@ -2,6 +2,7 @@
 
 import { ChevronLeft } from 'lucide-react'
 import Link from 'next/link'
+import { Suspense } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
@@ -11,7 +12,7 @@ import { Typography } from '@/components/ui/typography'
 
 import { useOtpPage } from './_hooks/use-sign-in-page'
 
-export default function OtpPage() {
+function OtpPageContent() {
   const { state, mutations, functions, features } = useOtpPage()
 
   return (
@@ -73,5 +74,19 @@ export default function OtpPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function OtpPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex justify-center items-center py-[48px]">
+          <Loader />
+        </div>
+      }
+    >
+      <OtpPageContent />
+    </Suspense>
   )
 }
