@@ -35,7 +35,6 @@ export function Contacts() {
           <Input
             {...features.contactsForm.register('lastName')}
             placeholder="Иванов"
-            required
             aria-invalid={!!features.contactsForm.formState.errors.lastName}
           />
           {!!features.contactsForm.formState.errors.lastName && (
@@ -48,7 +47,6 @@ export function Contacts() {
           <Input
             {...features.contactsForm.register('firstName')}
             placeholder="Иван"
-            required
             aria-invalid={!!features.contactsForm.formState.errors.firstName}
           />
           {!!features.contactsForm.formState.errors.firstName && (
@@ -61,7 +59,6 @@ export function Contacts() {
           <Input
             {...features.contactsForm.register('middleName')}
             placeholder="Иванович"
-            required
             aria-invalid={!!features.contactsForm.formState.errors.middleName}
           />
           {!!features.contactsForm.formState.errors.middleName && (
@@ -74,7 +71,6 @@ export function Contacts() {
           <Input
             {...features.contactsForm.register('city')}
             placeholder="Мюнхен"
-            required
             aria-invalid={!!features.contactsForm.formState.errors.city}
           />
           {!!features.contactsForm.formState.errors.city && (
@@ -88,7 +84,6 @@ export function Contacts() {
             type="tel"
             {...features.contactsForm.register('phone')}
             placeholder="+1"
-            required
             aria-invalid={!!features.contactsForm.formState.errors.phone}
           />
           {!!features.contactsForm.formState.errors.phone && (
@@ -101,7 +96,6 @@ export function Contacts() {
           <Input
             type="email"
             {...features.contactsForm.register('email')}
-            required
             placeholder="Email"
             aria-invalid={!!features.contactsForm.formState.errors.email}
           />

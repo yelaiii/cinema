@@ -36,7 +36,6 @@ export function Pay() {
           <Input
             {...features.payForm.register('pan')}
             placeholder="0000 0000 0000 0000"
-            required
             aria-invalid={!!features.payForm.formState.errors.pan}
           />
           {!!features.payForm.formState.errors.pan && (
@@ -49,7 +48,6 @@ export function Pay() {
           <Input
             {...features.payForm.register('expireDate')}
             placeholder="00/00"
-            required
             aria-invalid={!!features.payForm.formState.errors.expireDate}
           />
           {!!features.payForm.formState.errors.expireDate && (
@@ -63,7 +61,6 @@ export function Pay() {
             {...features.payForm.register('cvv')}
             placeholder="000"
             type="password"
-            required
             aria-invalid={!!features.payForm.formState.errors.cvv}
           />
           {!!features.payForm.formState.errors.cvv && (
@@ -75,7 +72,7 @@ export function Pay() {
       <Button
         type="submit"
         size="large"
-        disabled={!features.payForm.formState.isValid || mutations.payment.isLoading}
+        disabled={mutations.payment.isLoading}
         className="w-[unset] bottom-[20px] right-[20px] left-[20px] fixed"
       >
         Оплатить
