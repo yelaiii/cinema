@@ -45,7 +45,6 @@ export function useProfilePage() {
 
   const handleConfirmLogout = async () => {
     await logoutAction()
-    window.location.href = '/'
   }
 
   const handleUpdateProfile = (values: ProfileFormSchema) => {

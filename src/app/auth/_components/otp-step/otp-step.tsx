@@ -1,8 +1,4 @@
-'use client'
-
 import { ChevronLeft } from 'lucide-react'
-import Link from 'next/link'
-import { Suspense } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
@@ -10,24 +6,24 @@ import { Input } from '@/components/ui/input'
 import { Loader } from '@/components/ui/loader'
 import { Typography } from '@/components/ui/typography'
 
-import { useOtpPage } from './_hooks/use-sign-in-page'
+import { useOtpStep } from './hooks/use-otp-step'
 
-function OtpPageContent() {
-  const { state, mutations, functions, features } = useOtpPage()
+export function OtpStep() {
+  const { mutations, functions, features } = useOtpStep()
 
   return (
     <div>
       <div className="md:hidden h-[56px] gap-[16px] flex items-center">
-        <Link href={`/auth?${state.searchParams}`}>
+        <button onClick={functions.handleBack}>
           <ChevronLeft />
-        </Link>
+        </button>
         <Typography tag="h1" variant="title-md">
           Проверочный код
         </Typography>
       </div>
       <div className="mt-[24px] flex flex-col gap-[24px]">
         <Typography tag="div" variant="body-sm">
-          На указзанный вами номер был отправлен проверочный код
+          На указанный вами номер был отправлен проверочный код
         </Typography>
 
         <Field>
@@ -35,10 +31,7 @@ function OtpPageContent() {
           <Input
             placeholder="Проверочный код"
             {...features.otpField.register({
-              pattern: {
-                value: /^\d{6}$/,
-                message: 'Неверный код',
-              },
+              pattern: { value: /^\d{6}$/, message: 'Неверный код' },
             })}
             aria-invalid={!!features.otpField.error}
           />
@@ -48,7 +41,7 @@ function OtpPageContent() {
         <div className="py-[16px] flex flex-col gap-[10px]">
           <Button
             disabled={mutations.signIn.isLoading}
-            onClick={functions.handleSubmit}
+            onClick={functions.handleOtpSubmit}
             size="large"
             className="w-full"
           >
@@ -56,7 +49,7 @@ function OtpPageContent() {
             {mutations.signIn.isLoading && <Loader />}
           </Button>
           <Button
-            disabled={mutations.resendOtp.isLoading || features.timer.active}
+            disabled={mutations.createOtp.isLoading || features.timer.active}
             onClick={functions.handleResend}
             variant="secondary"
             size="large"
@@ -69,24 +62,10 @@ function OtpPageContent() {
                 сек
               </>
             )}
-            {mutations.resendOtp.isLoading && <Loader />}
+            {mutations.createOtp.isLoading && <Loader />}
           </Button>
         </div>
       </div>
     </div>
-  )
-}
-
-export default function OtpPage() {
-  return (
-    <Suspense
-      fallback={
-        <div className="flex justify-center items-center py-[48px]">
-          <Loader />
-        </div>
-      }
-    >
-      <OtpPageContent />
-    </Suspense>
   )
 }

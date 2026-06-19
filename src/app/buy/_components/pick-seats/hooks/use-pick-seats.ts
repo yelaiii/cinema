@@ -4,70 +4,83 @@ import { parseAsFloat, parseAsJson, parseAsString, parseAsStringEnum, useQuerySt
 import { useMemo } from 'react'
 
 import { getCinemaFilmByFilmIdSchedule } from '@/api'
-import { BUY_URL_PARAMS, BuyTicketsStep } from '@/app/buy/_constants'
+import { BuyFlowUrlParams, BuyFlowStep } from '@/app/buy/_constants'
 
 export function usePickSeats() {
   const router = useRouter()
 
   const [query, setQuery] = useQueryStates({
-    [BUY_URL_PARAMS.SEATS]: parseAsJson((v) => v as { row: number; column: number }[]),
-    [BUY_URL_PARAMS.FILM_ID]: parseAsString,
-    [BUY_URL_PARAMS.DATE]: parseAsString,
-    [BUY_URL_PARAMS.TIME]: parseAsString,
-    [BUY_URL_PARAMS.HALL_NAME]: parseAsString,
-    [BUY_URL_PARAMS.FULL_PRICE]: parseAsFloat,
-    [BUY_URL_PARAMS.STEP]: parseAsStringEnum<BuyTicketsStep>(Object.values(BuyTicketsStep)),
+    [BuyFlowUrlParams.SELECTED_SEATS]: parseAsJson(
+      (v) => v as { row: number; column: number }[],
+    ).withDefault([]),
+    [BuyFlowUrlParams.FILM_ID]: parseAsString,
+    [BuyFlowUrlParams.DATE]: parseAsString,
+    [BuyFlowUrlParams.TIME]: parseAsString,
+    [BuyFlowUrlParams.HALL_NAME]: parseAsString,
+    [BuyFlowUrlParams.FULL_PRICE]: parseAsFloat.withDefault(0),
+    [BuyFlowUrlParams.STEP]: parseAsStringEnum<BuyFlowStep>(Object.values(BuyFlowStep)),
   })
 
-  const selectedSeats = query[BUY_URL_PARAMS.SEATS] ?? []
-  const filmId = query[BUY_URL_PARAMS.FILM_ID]
-  const date = query[BUY_URL_PARAMS.DATE]
-  const time = query[BUY_URL_PARAMS.TIME]
-  const hallName = query[BUY_URL_PARAMS.HALL_NAME]
-  const fullPrice = query[BUY_URL_PARAMS.FULL_PRICE] ?? 0
-
-  const scheduleQuery = useQuery(() => getCinemaFilmByFilmIdSchedule({ path: { filmId: filmId! } }))
+  const scheduleQuery = useQuery(() =>
+    getCinemaFilmByFilmIdSchedule({ path: { filmId: query[BuyFlowUrlParams.FILM_ID]! } }),
+  )
 
   const seats = useMemo(() => {
     if (!scheduleQuery.data) return undefined
-    const schedule = scheduleQuery.data.data.schedules.find((s) => s.date === date)
-    const seance = schedule?.seances.find((s) => s.time === time && s.hall.name === hallName)
+    const schedule = scheduleQuery.data.data.schedules.find(
+      (s) => s.date === query[BuyFlowUrlParams.DATE],
+    )
+    const seance = schedule?.seances.find(
+      (s) =>
+        s.time === query[BuyFlowUrlParams.TIME] &&
+        s.hall.name === query[BuyFlowUrlParams.HALL_NAME],
+    )
     return seance?.hall.places
-  }, [scheduleQuery.data, date, time, hallName])
+  }, [
+    scheduleQuery.data,
+    query[BuyFlowUrlParams.DATE],
+    query[BuyFlowUrlParams.TIME],
+    query[BuyFlowUrlParams.HALL_NAME],
+  ])
 
   const handleSeatClick = async (row: number, column: number) => {
     if (!seats) return
     const seat = seats[row]?.[column]
     if (!seat || seat.type === 'BLOCKED') return
 
-    const isSelected = selectedSeats.some((s) => s.row === row && s.column === column)
+    const isSelected = query[BuyFlowUrlParams.SELECTED_SEATS].some(
+      (s) => s.row === row && s.column === column,
+    )
     if (isSelected) {
       await setQuery({
-        [BUY_URL_PARAMS.SEATS]: selectedSeats.filter(
+        [BuyFlowUrlParams.SELECTED_SEATS]: query[BuyFlowUrlParams.SELECTED_SEATS].filter(
           (s) => !(s.row === row && s.column === column),
         ),
-        [BUY_URL_PARAMS.FULL_PRICE]: fullPrice - seat.price,
+        [BuyFlowUrlParams.FULL_PRICE]: query[BuyFlowUrlParams.FULL_PRICE] - seat.price,
       })
     } else {
       await setQuery({
-        [BUY_URL_PARAMS.SEATS]: [...selectedSeats, { row, column }],
-        [BUY_URL_PARAMS.FULL_PRICE]: fullPrice + seat.price,
+        [BuyFlowUrlParams.SELECTED_SEATS]: [
+          ...query[BuyFlowUrlParams.SELECTED_SEATS],
+          { row, column },
+        ],
+        [BuyFlowUrlParams.FULL_PRICE]: query[BuyFlowUrlParams.FULL_PRICE] + seat.price,
       })
     }
   }
 
   const handleNext = async () => {
-    await setQuery({ [BUY_URL_PARAMS.STEP]: BuyTicketsStep.ReviewTickets })
+    await setQuery({ [BuyFlowUrlParams.STEP]: BuyFlowStep.REVIEW_TICKETS })
   }
 
   const handleBack = () => {
-    router.push(`/film/${filmId}`)
+    router.push(`/film/${query[BuyFlowUrlParams.FILM_ID]}`)
   }
 
   return {
     state: {
       seats,
-      selectedSeats,
+      selectedSeats: query[BuyFlowUrlParams.SELECTED_SEATS],
     },
     queries: {
       schedule: scheduleQuery,

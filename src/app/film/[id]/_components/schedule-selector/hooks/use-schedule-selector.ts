@@ -5,7 +5,7 @@ import { parseAsString, useQueryStates } from 'nuqs'
 
 import type { FilmResponse } from '@/api'
 
-import { BUY_URL_PARAMS, BuyTicketsStep } from '@/app/buy/_constants'
+import { BuyFlowUrlParams, BuyFlowStep } from '@/app/buy/_constants'
 
 export function useScheduleSelector({
   film,
@@ -19,27 +19,23 @@ export function useScheduleSelector({
   const { id } = useParams<{ id: string }>()
 
   const [query, setQuery] = useQueryStates({
-    [BUY_URL_PARAMS.DATE]: parseAsString,
-    [BUY_URL_PARAMS.TIME]: parseAsString,
-    [BUY_URL_PARAMS.HALL_NAME]: parseAsString,
+    [BuyFlowUrlParams.DATE]: parseAsString.withDefault(defaultDate),
+    [BuyFlowUrlParams.TIME]: parseAsString,
+    [BuyFlowUrlParams.HALL_NAME]: parseAsString,
   })
-
-  const date = query[BUY_URL_PARAMS.DATE] || defaultDate
-  const time = query[BUY_URL_PARAMS.TIME] || ''
-  const hallName = query[BUY_URL_PARAMS.HALL_NAME] || ''
 
   const handleDateChange = async (value: string) => {
     await setQuery({
-      [BUY_URL_PARAMS.DATE]: value,
-      [BUY_URL_PARAMS.HALL_NAME]: null,
-      [BUY_URL_PARAMS.TIME]: null,
+      [BuyFlowUrlParams.DATE]: value,
+      [BuyFlowUrlParams.HALL_NAME]: null,
+      [BuyFlowUrlParams.TIME]: null,
     })
   }
 
   const handleTimeChange = async (hallName: string, time: string) => {
     await setQuery({
-      [BUY_URL_PARAMS.HALL_NAME]: hallName,
-      [BUY_URL_PARAMS.TIME]: time,
+      [BuyFlowUrlParams.HALL_NAME]: hallName,
+      [BuyFlowUrlParams.TIME]: time,
     })
   }
 
@@ -52,24 +48,29 @@ export function useScheduleSelector({
   }
 
   const handleSubmit = () => {
-    if (!date || !time || !hallName) return
+    if (
+      !query[BuyFlowUrlParams.DATE] ||
+      !query[BuyFlowUrlParams.TIME] ||
+      !query[BuyFlowUrlParams.HALL_NAME]
+    )
+      return
 
     const searchParams = new URLSearchParams({
-      [BUY_URL_PARAMS.DATE]: date,
-      [BUY_URL_PARAMS.TIME]: time,
-      [BUY_URL_PARAMS.HALL_NAME]: hallName,
-      [BUY_URL_PARAMS.FILM_ID]: id,
-      [BUY_URL_PARAMS.STEP]: BuyTicketsStep.PickSeats,
-      [BUY_URL_PARAMS.FILM_NAME]: film.name,
-    }).toString()
-    router.push(`/buy/?${searchParams}`)
+      [BuyFlowUrlParams.DATE]: query[BuyFlowUrlParams.DATE],
+      [BuyFlowUrlParams.TIME]: query[BuyFlowUrlParams.TIME]!,
+      [BuyFlowUrlParams.HALL_NAME]: query[BuyFlowUrlParams.HALL_NAME]!,
+      [BuyFlowUrlParams.FILM_ID]: id,
+      [BuyFlowUrlParams.STEP]: BuyFlowStep.PICK_SEATS,
+      [BuyFlowUrlParams.FILM_NAME]: film.name,
+    })
+    router.push(`/buy/?${searchParams.toString()}`)
   }
 
   return {
     state: {
-      date,
-      time,
-      hallName,
+      date: query[BuyFlowUrlParams.DATE],
+      time: query[BuyFlowUrlParams.TIME],
+      hallName: query[BuyFlowUrlParams.HALL_NAME],
     },
     functions: {
       handleTabClick,

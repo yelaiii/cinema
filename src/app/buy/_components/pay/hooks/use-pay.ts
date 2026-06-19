@@ -1,41 +1,62 @@
-import { useField, useMutation } from '@siberiacancode/reactuse'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useMutation } from '@siberiacancode/reactuse'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { useForm } from 'react-hook-form'
+import z from 'zod'
 
 import { postCinemaPayment } from '@/api'
-import { BUY_URL_PARAMS, BuyTicketsStep } from '@/app/buy/_constants'
+import { BuyFlowUrlParams, BuyFlowStep } from '@/app/buy/_constants'
+
+export const PayFormSchema = z.object({
+  pan: z
+    .string()
+    .trim()
+    .regex(/^(?: *\d){16} *$/, 'Неверный формат карты'),
+  expireDate: z
+    .string()
+    .trim()
+    .regex(/^(0[1-9]|1[0-2])\/\d{2}$/, 'Формат должен быть ММ/ГГ'),
+  cvv: z
+    .string()
+    .trim()
+    .regex(/^\d{3}$/, 'CVV должен состоять из 3 цифр'),
+})
+export type PayFormValues = z.infer<typeof PayFormSchema>
 
 export function usePay() {
   const router = useRouter()
   const searchParams = useSearchParams()
 
-  const panField = useField('', { validateOnChange: true })
-  const expireDateField = useField('', { validateOnChange: true })
-  const cvvField = useField('', { validateOnChange: true })
+  const payForm = useForm<PayFormValues>({
+    resolver: zodResolver(PayFormSchema),
+    mode: 'all',
+    defaultValues: {
+      pan: '',
+      expireDate: '',
+      cvv: '',
+    },
+  })
 
   const paymentMutation = useMutation(postCinemaPayment)
 
   const handleBack = () => {
     const params = new URLSearchParams(searchParams.toString())
-    params.set(BUY_URL_PARAMS.STEP, BuyTicketsStep.Contacts)
+    params.set(BuyFlowUrlParams.STEP, BuyFlowStep.CONTACTS)
     router.push(`?${params.toString()}`)
   }
 
-  const handleNext = async () => {
-    panField.clearError()
-    expireDateField.clearError()
-    cvvField.clearError()
-
-    const filmId = searchParams.get(BUY_URL_PARAMS.FILM_ID)
-    const date = searchParams.get(BUY_URL_PARAMS.DATE)
-    const time = searchParams.get(BUY_URL_PARAMS.TIME)
-
-    const seatsStr = searchParams.get(BUY_URL_PARAMS.SEATS)
-    const seats = seatsStr ? (JSON.parse(seatsStr) as { row: number; column: number }[]) : undefined
-
-    const firstName = searchParams.get(BUY_URL_PARAMS.FIRST_NAME)
-    const lastName = searchParams.get(BUY_URL_PARAMS.LAST_NAME)
-    const middleName = searchParams.get(BUY_URL_PARAMS.MIDDLE_NAME)
-    const phone = searchParams.get(BUY_URL_PARAMS.PHONE)
+  const handleNext = payForm.handleSubmit(async (values: PayFormValues) => {
+    const filmId = searchParams.get(BuyFlowUrlParams.FILM_ID)
+    const date = searchParams.get(BuyFlowUrlParams.DATE)
+    const time = searchParams.get(BuyFlowUrlParams.TIME)
+    const firstName = searchParams.get(BuyFlowUrlParams.FIRST_NAME)
+    const lastName = searchParams.get(BuyFlowUrlParams.LAST_NAME)
+    const middleName = searchParams.get(BuyFlowUrlParams.MIDDLE_NAME)
+    const phone = searchParams.get(BuyFlowUrlParams.PHONE)
+    const seats = JSON.parse(searchParams.get(BuyFlowUrlParams.SELECTED_SEATS)!) as {
+      row: number
+      column: number
+    }[]
 
     if (!filmId || !date || !time || !seats || !firstName || !lastName || !middleName || !phone)
       return
@@ -50,9 +71,9 @@ export function usePay() {
           phone,
         },
         debitCard: {
-          pan: panField.getValue().trim(),
-          expireDate: expireDateField.getValue().trim(),
-          cvv: cvvField.getValue().trim(),
+          pan: values.pan.trim(),
+          expireDate: values.expireDate.trim(),
+          cvv: values.cvv.trim(),
         },
         seance: {
           date,
@@ -65,11 +86,11 @@ export function usePay() {
     if (paymentResponse.data.order.status === 'PAYED') {
       const ids = paymentResponse.data.order.tickets.map((t) => t._id)
       const params = new URLSearchParams(searchParams.toString())
-      params.set(BUY_URL_PARAMS.TICKETS, JSON.stringify(ids))
-      params.set(BUY_URL_PARAMS.STEP, BuyTicketsStep.Payed)
+      params.set(BuyFlowUrlParams.TICKETS, JSON.stringify(ids))
+      params.set(BuyFlowUrlParams.STEP, BuyFlowStep.SUCCESS)
       router.push(`?${params.toString()}`)
     }
-  }
+  })
 
   return {
     functions: {
@@ -80,9 +101,7 @@ export function usePay() {
       payment: paymentMutation,
     },
     features: {
-      panField,
-      expireDateField,
-      cvvField,
+      payForm,
     },
   }
 }

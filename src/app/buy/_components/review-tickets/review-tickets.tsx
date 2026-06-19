@@ -87,7 +87,7 @@ export function ReviewTickets() {
         ))}
       </div>
 
-      <Typography variant="title-lg" className="mt-[12px]">
+      <Typography variant="title-lg" className="mt-[12px] pb-[100px]">
         Сумма: {state.fullPrice}$
       </Typography>
 

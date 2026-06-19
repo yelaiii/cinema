@@ -1,11 +1,11 @@
-export const BUY_URL_PARAMS = {
+export const BuyFlowUrlParams = {
   STEP: 'step',
   FILM_ID: 'id',
   FILM_NAME: 'film',
   DATE: 'date',
   TIME: 'time',
   HALL_NAME: 'hall',
-  SEATS: 'seats',
+  SELECTED_SEATS: 'seats',
   FULL_PRICE: 'price',
   LAST_NAME: 'lastName',
   FIRST_NAME: 'firstName',
@@ -16,11 +16,11 @@ export const BUY_URL_PARAMS = {
   TICKETS: 'tickets',
 } as const
 
-export const BuyTicketsStep = {
-  PickSeats: 'pick-seats',
-  ReviewTickets: 'review-tickets',
-  Contacts: 'contacts',
-  Pay: 'pay',
-  Payed: 'payed',
+export const BuyFlowStep = {
+  PICK_SEATS: 'pick-seats',
+  REVIEW_TICKETS: 'review-tickets',
+  CONTACTS: 'contacts',
+  PAY: 'pay',
+  SUCCESS: 'payed',
 } as const
-export type BuyTicketsStep = (typeof BuyTicketsStep)[keyof typeof BuyTicketsStep]
+export type BuyFlowStep = (typeof BuyFlowStep)[keyof typeof BuyFlowStep]

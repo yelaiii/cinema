@@ -1,57 +1,29 @@
 'use client'
 
-import z from 'zod'
+import type { ComponentType, JSX } from 'react'
 
-import { Button } from '@/components/ui/button'
-import { Field, FieldError, FieldLabel } from '@/components/ui/field'
-import { Input } from '@/components/ui/input'
-import { Loader } from '@/components/ui/loader'
-import { Typography } from '@/components/ui/typography'
+import dynamic from 'next/dynamic'
+import { parseAsStringEnum, useQueryState } from 'nuqs'
 
-import { useAuthPage } from './_hooks/use-auth-page'
+import { OtpStepSkeleton } from './_components/otp-step/components/otp-step-skeleton'
+import { PhoneStep } from './_components/phone-step'
+import { AuthFlowUrlParams, AuthFlowStep } from './_constants'
+
+const STEPS: Record<AuthFlowStep, (() => JSX.Element) | ComponentType> = {
+  [AuthFlowStep.PHONE]: PhoneStep,
+  [AuthFlowStep.OTP]: dynamic(() => import('./_components/otp-step'), {
+    ssr: false,
+    loading: OtpStepSkeleton,
+  }),
+}
 
 export default function AuthPage() {
-  const { mutations, functions, features } = useAuthPage()
-
-  return (
-    <div>
-      <div className="md:hidden h-[56px] flex items-center">
-        <Typography tag="h1" variant="title-md">
-          Авторизация
-        </Typography>
-      </div>
-      <div className="mt-[24px] flex flex-col gap-[24px]">
-        <Typography tag="div" variant="body-sm">
-          Введите номер телефона для входа в свой профиль
-        </Typography>
-
-        <Field>
-          <FieldLabel>Телефон</FieldLabel>
-          <Input
-            type="tel"
-            placeholder="+1"
-            required
-            {...features.phoneField.register({
-              validate: (value) =>
-                z.e164().safeParse(value).success ? true : 'Неверный номер телефона',
-            })}
-            aria-invalid={!!features.phoneField.error}
-          />
-          {features.phoneField.error && <FieldError>{features.phoneField.error}</FieldError>}
-        </Field>
-
-        <div className="py-[16px]">
-          <Button
-            disabled={mutations.createOtp.isLoading}
-            onClick={functions.handleSubmit}
-            size="large"
-            className="w-full"
-          >
-            Продолжить
-            {mutations.createOtp.isLoading && <Loader />}
-          </Button>
-        </div>
-      </div>
-    </div>
+  const [step] = useQueryState(
+    AuthFlowUrlParams.STEP,
+    parseAsStringEnum<AuthFlowStep>(Object.values(AuthFlowStep)).withDefault(AuthFlowStep.PHONE),
   )
+
+  const Component = STEPS[step]
+
+  return <Component />
 }

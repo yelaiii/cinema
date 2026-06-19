@@ -1,21 +1,21 @@
 import { useSearchParams } from 'next/navigation'
 import { useRouter } from 'next/navigation'
 
-import { BUY_URL_PARAMS } from '@/app/buy/_constants'
+import { BuyFlowUrlParams } from '@/app/buy/_constants'
 
 export function usePayed() {
   const router = useRouter()
   const searchParams = useSearchParams()
 
-  const filmName = searchParams.get(BUY_URL_PARAMS.FILM_NAME)
-  const seats = JSON.parse(searchParams.get(BUY_URL_PARAMS.SEATS)!) as {
+  const filmName = searchParams.get(BuyFlowUrlParams.FILM_NAME)
+  const seats = JSON.parse(searchParams.get(BuyFlowUrlParams.SELECTED_SEATS)!) as {
     row: number
     column: number
   }[]
-  const date = searchParams.get(BUY_URL_PARAMS.DATE)
-  const time = searchParams.get(BUY_URL_PARAMS.TIME)
-  const hallName = searchParams.get(BUY_URL_PARAMS.HALL_NAME)
-  const ticketIds = JSON.parse(searchParams.get(BUY_URL_PARAMS.TICKETS)!) as string[]
+  const date = searchParams.get(BuyFlowUrlParams.DATE)
+  const time = searchParams.get(BuyFlowUrlParams.TIME)
+  const hallName = searchParams.get(BuyFlowUrlParams.HALL_NAME)
+  const ticketIds = JSON.parse(searchParams.get(BuyFlowUrlParams.TICKETS)!) as string[]
 
   const formattedSeats = (() => {
     if (!seats?.length) return ''

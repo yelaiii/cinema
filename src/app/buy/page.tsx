@@ -12,9 +12,9 @@ import { Pay } from './_components/pay'
 import { Payed } from './_components/payed'
 import { PickSeats } from './_components/pick-seats'
 import { ReviewTickets } from './_components/review-tickets'
-import { BUY_URL_PARAMS, BuyTicketsStep } from './_constants'
+import { BuyFlowUrlParams, BuyFlowStep } from './_constants'
 
-const STEPS: Record<BuyTicketsStep, () => JSX.Element> = {
+const STEPS: Record<BuyFlowStep, () => JSX.Element> = {
   'pick-seats': PickSeats,
   'review-tickets': ReviewTickets,
   contacts: Contacts,
@@ -24,10 +24,8 @@ const STEPS: Record<BuyTicketsStep, () => JSX.Element> = {
 
 function BuyTicketPageContent() {
   const [step] = useQueryState(
-    BUY_URL_PARAMS.STEP,
-    parseAsStringEnum<BuyTicketsStep>(Object.values(BuyTicketsStep)).withDefault(
-      BuyTicketsStep.PickSeats,
-    ),
+    BuyFlowUrlParams.STEP,
+    parseAsStringEnum<BuyFlowStep>(Object.values(BuyFlowStep)).withDefault(BuyFlowStep.PICK_SEATS),
   )
 
   const Component = STEPS[step]
