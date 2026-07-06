@@ -32,13 +32,10 @@ export function usePayed() {
     return Object.entries(grouped)
       .map(([row, cols]) => {
         cols.sort((a, b) => a - b)
-        const colStr = formatter.format(cols.map(String))
-        const word = cols.length === 1 ? t('common.seat.singular') : t('common.seat.plural')
-
         return t('common.row-seats-list-format', {
           row,
-          seats: colStr,
-          seatWord: word,
+          seats: formatter.format(cols.map(String)),
+          count: cols.length,
         })
       })
       .join('; ')

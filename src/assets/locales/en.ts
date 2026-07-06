@@ -81,7 +81,8 @@ export default {
   'validation.invalid-otp': 'Invalid code',
   'common.row-seat-format': 'Row {row}, seat {seat}',
   'common.row': 'row',
-  'common.seat.singular': 'seat',
-  'common.seat.plural': 'seats',
-  'common.row-seats-list-format': 'Row {row}, {seats} {seatWord}',
+  'common.row-seats-list-format': {
+    one: 'Row {row}, seat {seats}',
+    other: 'Row {row}, seats {seats}',
+  },
 } as const

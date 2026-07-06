@@ -81,7 +81,10 @@ export default {
   'validation.invalid-otp': 'Невірний код',
   'common.row-seat-format': '{row} ряд, {seat} місце',
   'common.row': 'ряд',
-  'common.seat.singular': 'місце',
-  'common.seat.plural': 'місця',
-  'common.row-seats-list-format': '{row} ряд, {seats} {seatWord}',
+  'common.row-seats-list-format': {
+    one: '{row} ряд, {seats} місце',
+    few: '{row} ряд, {seats} місця',
+    many: '{row} ряд, {seats} місць',
+    other: '{row} ряд, {seats} місць',
+  },
 } as const

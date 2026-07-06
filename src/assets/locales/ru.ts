@@ -81,7 +81,10 @@ export default {
   'validation.invalid-otp': 'Неверный код',
   'common.row-seat-format': '{row} ряд, {seat} место',
   'common.row': 'ряд',
-  'common.seat.singular': 'место',
-  'common.seat.plural': 'места',
-  'common.row-seats-list-format': '{row} ряд, {seats} {seatWord}',
+  'common.row-seats-list-format': {
+    one: '{row} ряд, {seats} место',
+    few: '{row} ряд, {seats} места',
+    many: '{row} ряд, {seats} мест',
+    other: '{row} ряд, {seats} мест',
+  },
 } as const
