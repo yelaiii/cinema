@@ -15,7 +15,7 @@ export const ProfileFormSchema = z.object({
   firstName: z.string().trim(),
   middleName: z.string().trim(),
   city: z.string().trim(),
-  email: z.email('Некорректный email').trim().or(z.literal('')),
+  email: z.email('validation.invalid-email').trim().or(z.literal('')),
 })
 export type ProfileFormSchema = z.infer<typeof ProfileFormSchema>
 

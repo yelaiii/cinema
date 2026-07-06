@@ -1,3 +1,6 @@
+'use client'
+
+import { useI18n } from '@kanjou/react'
 import z from 'zod'
 
 import { Button } from '@/components/ui/button'
@@ -9,33 +12,34 @@ import { Typography } from '@/components/ui/typography'
 import { usePhoneStep } from './hooks/use-phone-step'
 
 export function PhoneStep() {
+  const { t } = useI18n()
   const { mutations, functions, features } = usePhoneStep()
 
   return (
     <div>
       <div className="md:hidden h-[56px] flex items-center">
         <Typography tag="h1" variant="title-md">
-          Авторизация
+          {t('auth.title')}
         </Typography>
       </div>
       <div className="mt-[24px] flex flex-col gap-[24px]">
         <Typography tag="div" variant="body-sm">
-          Введите номер телефона для входа в свой профиль
+          {t('auth.description')}
         </Typography>
 
         <Field>
-          <FieldLabel>Телефон</FieldLabel>
+          <FieldLabel>{t('input.phone.label')}</FieldLabel>
           <Input
             type="tel"
-            placeholder="+1"
+            placeholder={t('input.phone.placeholder')}
             required
             {...features.phoneField.register({
               validate: (value) =>
-                z.e164().safeParse(value).success ? true : 'Неверный номер телефона',
+                z.e164().safeParse(value).success ? true : 'validation.invalid-phone',
             })}
             aria-invalid={!!features.phoneField.error}
           />
-          {features.phoneField.error && <FieldError>{features.phoneField.error}</FieldError>}
+          {features.phoneField.error && <FieldError>{t(features.phoneField.error)}</FieldError>}
         </Field>
 
         <div className="py-[16px]">
@@ -45,7 +49,7 @@ export function PhoneStep() {
             size="large"
             className="w-full"
           >
-            Продолжить
+            {t('button.continue')}
             {mutations.createOtp.isLoading && <Loader />}
           </Button>
         </div>

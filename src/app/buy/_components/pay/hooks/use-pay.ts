@@ -11,15 +11,15 @@ export const PayFormSchema = z.object({
   pan: z
     .string()
     .trim()
-    .regex(/^(?: *\d){16} *$/, 'Неверный формат карты'),
+    .regex(/^(?: *\d){16} *$/, 'validation.invalid-card-format'),
   expireDate: z
     .string()
     .trim()
-    .regex(/^(0[1-9]|1[0-2])\/\d{2}$/, 'Формат должен быть ММ/ГГ'),
+    .regex(/^(0[1-9]|1[0-2])\/\d{2}$/, 'validation.invalid-expiry-format'),
   cvv: z
     .string()
     .trim()
-    .regex(/^\d{3}$/, 'CVV должен состоять из 3 цифр'),
+    .regex(/^\d{3}$/, 'validation.invalid-cvv-format'),
 })
 export type PayFormValues = z.infer<typeof PayFormSchema>
 
@@ -83,7 +83,7 @@ export function usePay() {
       },
     })
 
-    if (paymentResponse.data.order.status === 'PAYED') {
+    if (paymentResponse.data.order.status === 'paid') {
       const ids = paymentResponse.data.order.tickets.map((t) => t._id)
       const params = new URLSearchParams(searchParams.toString())
       params.set(BuyFlowUrlParams.TICKETS, JSON.stringify(ids))

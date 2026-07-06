@@ -1,5 +1,6 @@
 import { getCinemaFilms } from '@/api'
 import { Typography } from '@/components/ui/typography'
+import { getI18n } from '@/lib/i18n'
 
 import { FilmCard } from './_components/film-card'
 
@@ -8,12 +9,13 @@ export const revalidate = 86400
 export default async function HomePage() {
   const filmsResponse = await getCinemaFilms()
   const films = filmsResponse.data.films
+  const { t } = await getI18n()
 
   return (
     <div>
       <div className="md:hidden h-14 flex items-center">
         <Typography tag="h1" variant="title-md">
-          Фильмы
+          {t('menu.films')}
         </Typography>
       </div>
       <div className="flex flex-col gap-[40px] py-6 pb-40">

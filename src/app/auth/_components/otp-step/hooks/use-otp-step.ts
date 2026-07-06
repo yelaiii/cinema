@@ -1,11 +1,11 @@
-import { useField, useMount, useMutation, useTimer } from '@siberiacancode/reactuse'
+import { useField, useMutation, useTimer } from '@siberiacancode/reactuse'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { parseAsFloat, useQueryState } from 'nuqs'
 
 import { postAuthOtp, postUsersSignin } from '@/api'
 import { useUser } from '@/app/_contexts/user'
+import { AuthFlowStep, AuthFlowUrlParams } from '@/app/auth/_constants'
 
-import { AuthFlowStep, AuthFlowUrlParams } from '../../../_constants'
 import { setTokenAction } from '../actions/sign-in'
 
 export function useOtpStep() {
@@ -46,7 +46,7 @@ export function useOtpStep() {
       })
       .catch(() => null)
 
-    if (!signInResponse?.data?.success) return otpField.setError('Неверный код')
+    if (!signInResponse?.data?.success) return otpField.setError('validation.invalid-otp')
 
     await setTokenAction(signInResponse.data.token)
     setUser(signInResponse.data.user)

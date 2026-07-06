@@ -1,14 +1,18 @@
+import { useI18n } from '@kanjou/react'
+
 import { Loader } from '@/components/ui/loader'
 import { Typography } from '@/components/ui/typography'
 
 export function SeatsSkeleton() {
+  const { t } = useI18n()
+
   return (
     <div className="mt-[24px] w-full animate-pulse relative">
       <div className="flex justify-center items-center absolute inset-0 py-[48px] bg-background/50 z-10">
         <Loader />
       </div>
       <Typography variant="body-sm" className="opacity-50">
-        Ряд
+        {t('buy.pick-seats.row')}
       </Typography>
       <div className="overflow-x-auto py-[12px] opacity-20">
         <div className="flex flex-col gap-y-[24px]">

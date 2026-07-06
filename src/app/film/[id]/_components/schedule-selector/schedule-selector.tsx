@@ -1,5 +1,6 @@
 'use client'
 
+import { useI18n } from '@kanjou/react'
 import { XIcon } from 'lucide-react'
 
 import type { FilmResponse, ScheduleResponse } from '@/api'
@@ -22,6 +23,7 @@ export function ScheduleSelector({
   schedules: ScheduleResponse['schedules']
   timeByHall: TimeByHall
 }) {
+  const { t, locale } = useI18n()
   const { state, functions } = useScheduleSelector({ film, defaultDate: schedules[0].date })
 
   return (
@@ -38,7 +40,7 @@ export function ScheduleSelector({
               value={schedule.date}
               onClick={functions.handleTabClick}
             >
-              {parseDDMMYY(schedule.date).toLocaleDateString('ru-RU', {
+              {parseDDMMYY(schedule.date).toLocaleDateString(locale, {
                 day: 'numeric',
                 month: 'short',
                 weekday: 'short',
@@ -77,7 +79,7 @@ export function ScheduleSelector({
           disabled={!state.time || !state.hallName}
           className="w-full"
         >
-          Продолжить
+          {t('button.continue')}
         </Button>
       </div>
     </div>

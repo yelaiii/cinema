@@ -1,9 +1,11 @@
+import { useI18n } from '@kanjou/react'
 import { useSearchParams } from 'next/navigation'
 import { useRouter } from 'next/navigation'
 
 import { BuyFlowUrlParams } from '@/app/buy/_constants'
 
 export function usePayed() {
+  const { t, locale } = useI18n()
   const router = useRouter()
   const searchParams = useSearchParams()
 
@@ -20,7 +22,7 @@ export function usePayed() {
   const formattedSeats = (() => {
     if (!seats?.length) return ''
 
-    const formatter = new Intl.ListFormat('ru', { style: 'long', type: 'conjunction' })
+    const formatter = new Intl.ListFormat(locale, { style: 'long', type: 'conjunction' })
 
     const grouped = seats.reduce<Record<number, number[]>>((acc, { row, column }) => {
       ;(acc[row] ??= []).push(column)
@@ -31,9 +33,13 @@ export function usePayed() {
       .map(([row, cols]) => {
         cols.sort((a, b) => a - b)
         const colStr = formatter.format(cols.map(String))
-        const word = cols.length === 1 ? 'место' : 'места'
+        const word = cols.length === 1 ? t('common.seat.singular') : t('common.seat.plural')
 
-        return `${row} ряд, ${colStr} ${word}`
+        return t('common.row-seats-list-format', {
+          row,
+          seats: colStr,
+          seatWord: word,
+        })
       })
       .join('; ')
   })()

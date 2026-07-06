@@ -1,5 +1,6 @@
 'use client'
 
+import { useI18n } from '@kanjou/react'
 import { BanIcon, CircleCheckIcon, CircleQuestionMarkIcon, TicketIcon } from 'lucide-react'
 
 import type { CinemaTicket } from '@/api'
@@ -23,6 +24,7 @@ interface TicketCardProps {
 }
 
 export function TicketCard({ ticket, i }: TicketCardProps) {
+  const { t, locale } = useI18n()
   const { state, functions, features } = useTicketCard({ ticket })
 
   return (
@@ -30,7 +32,7 @@ export function TicketCard({ ticket, i }: TicketCardProps) {
       <div className="flex justify-between">
         <div>
           <Typography variant="caption" className="text-surface">
-            Билет
+            {t('ticket.ticket')}
           </Typography>
           <Typography variant="body-lg">{i}</Typography>
         </div>
@@ -40,53 +42,55 @@ export function TicketCard({ ticket, i }: TicketCardProps) {
         </div>
       </div>
 
-      <Badge type={ticket.status === 'PAYED' ? 'success' : 'failure'}>
-        {ticket.status === 'PAYED' && (
+      <Badge type={ticket.status === 'paid' ? 'success' : 'failure'}>
+        {ticket.status === 'paid' && (
           <>
-            оплачен <CircleCheckIcon size={16} />
+            {t('ticket.status.paid')} <CircleCheckIcon size={16} />
           </>
         )}
-        {ticket.status === 'CANCELED' && (
+        {ticket.status === 'cancelled' && (
           <>
-            отменён <BanIcon size={16} />
+            {t('ticket.status.canceled')} <BanIcon size={16} />
           </>
         )}
       </Badge>
 
       <div>
         <Typography variant="caption" className="text-surface">
-          Дата и врёмя
+          {t('ticket.date-time')}
         </Typography>
         <Typography variant="body-sm">
-          {state.date.toLocaleDateString('ru-RU', {
-            day: 'numeric',
-            month: 'long',
-          })}{' '}
-          в {ticket.seance.time}
+          {t('ticket.date-time-format', {
+            date: state.date.toLocaleDateString(locale, {
+              day: 'numeric',
+              month: 'long',
+            }),
+            time: ticket.seance.time,
+          })}
         </Typography>
       </div>
 
       <div>
         <Typography variant="caption" className="text-surface">
-          Зал
+          {t('ticket.hall')}
         </Typography>
         <Typography variant="body-sm">{ticket.hall?.name}</Typography>
       </div>
 
       <div>
         <Typography variant="caption" className="text-surface">
-          Место
+          {t('ticket.seat')}
         </Typography>
         <Typography variant="body-sm">
-          {ticket.row} ряд, {ticket.column} место
+          {t('common.row-seat-format', { row: ticket.row, seat: ticket.column })}
         </Typography>
       </div>
 
-      {ticket.status === 'PAYED' && state.date.getTime() > Date.now() && (
+      {ticket.status === 'paid' && state.date.getTime() > Date.now() && (
         <Drawer open={features.drawer.opened} onOpenChange={features.drawer.toggle}>
           <DrawerTrigger asChild>
             <Button variant="secondary" size="large" className="w-full">
-              Вернуть билет
+              {t('button.return-ticket')}
             </Button>
           </DrawerTrigger>
           <DrawerContent>
@@ -98,11 +102,11 @@ export function TicketCard({ ticket, i }: TicketCardProps) {
                   className: 'py-[12px] text-center',
                 })}
               >
-                Вы уверены, что хотите вернуть билет?
+                {t('ticket.return-confirm')}
               </DrawerTitle>
               <DrawerClose asChild>
                 <Button className="w-full" variant="secondary" size="large" type="button">
-                  Отменить
+                  {t('button.cancel')}
                 </Button>
               </DrawerClose>
               <Button
@@ -111,7 +115,7 @@ export function TicketCard({ ticket, i }: TicketCardProps) {
                 onClick={functions.handleReturnTicket}
                 type="button"
               >
-                Вернуть
+                {t('button.return')}
               </Button>
             </div>
           </DrawerContent>

@@ -1,5 +1,6 @@
 'use client'
 
+import { useI18n } from '@kanjou/react'
 import { ChevronLeft, TicketIcon } from 'lucide-react'
 
 import { parseDDMMYY } from '@/app/_utils/parse-date-string'
@@ -9,6 +10,7 @@ import { Typography } from '@/components/ui/typography'
 import { useReviewTickets } from './hooks/use-review-tickets'
 
 export function ReviewTickets() {
+  const { t, locale } = useI18n()
   const { state, functions } = useReviewTickets()
 
   return (
@@ -16,12 +18,12 @@ export function ReviewTickets() {
       <div className="md:hidden h-[56px] gap-[16px] flex items-center">
         <ChevronLeft className="cursor-pointer" onClick={functions.handleBack} tabIndex={0} />
         <Typography tag="h1" variant="title-md">
-          Информация о билетах
+          {t('buy.review-tickets.title')}
         </Typography>
       </div>
 
       <div className="mt-[24px]">
-        <Typography variant="caption">Шаг 2 из 4</Typography>
+        <Typography variant="caption">{t('buy.step-format', { current: 2, total: 4 })}</Typography>
         <div className="relative">
           <div className="absolute w-full bg-muted h-[4px] rounded-[16px]"></div>
           <div className="absolute w-2/4 bg-pink-500 h-[4px] rounded-[16px]"></div>
@@ -30,7 +32,7 @@ export function ReviewTickets() {
 
       <div className="mt-[24px]">
         <Typography variant="caption" className="text-surface">
-          Название фильма
+          {t('buy.review-tickets.film-name')}
         </Typography>
         <Typography variant="body-lg">{state.filmName}</Typography>
       </div>
@@ -44,7 +46,7 @@ export function ReviewTickets() {
             <div className="flex justify-between">
               <div>
                 <Typography variant="caption" className="text-surface">
-                  Билет
+                  {t('ticket.ticket')}
                 </Typography>
                 <Typography variant="body-lg">{i + 1}</Typography>
               </div>
@@ -56,31 +58,33 @@ export function ReviewTickets() {
 
             <div>
               <Typography variant="caption" className="text-surface">
-                Дата и время
+                {t('ticket.date-time')}
               </Typography>
               <Typography variant="body-sm">
                 {state.date &&
-                  parseDDMMYY(state.date).toLocaleDateString('ru-RU', {
-                    day: 'numeric',
-                    month: 'long',
-                  })}{' '}
-                в {state.time}
+                  t('ticket.date-time-format', {
+                    date: parseDDMMYY(state.date).toLocaleDateString(locale, {
+                      day: 'numeric',
+                      month: 'long',
+                    }),
+                    time: state.time || '',
+                  })}
               </Typography>
             </div>
 
             <div>
               <Typography variant="caption" className="text-surface">
-                Зал
+                {t('ticket.hall')}
               </Typography>
               <Typography variant="body-sm">{state.hallName}</Typography>
             </div>
 
             <div>
               <Typography variant="caption" className="text-surface">
-                Место
+                {t('ticket.seat')}
               </Typography>
               <Typography variant="body-sm">
-                {seat.row} ряд, {seat.column} место
+                {t('common.row-seat-format', { row: seat.row, seat: seat.column })}
               </Typography>
             </div>
           </div>
@@ -88,7 +92,7 @@ export function ReviewTickets() {
       </div>
 
       <Typography variant="title-lg" className="mt-[12px] pb-[100px]">
-        Сумма: {state.fullPrice}$
+        {t('buy.review-tickets.total-price', { price: state.fullPrice })}
       </Typography>
 
       <Button
@@ -96,7 +100,7 @@ export function ReviewTickets() {
         size="large"
         className="w-[unset] bottom-[20px] right-[20px] left-[20px] fixed"
       >
-        Купить билеты
+        {t('button.buy-tickets')}
       </Button>
     </div>
   )

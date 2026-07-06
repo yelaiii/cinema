@@ -1,3 +1,6 @@
+'use client'
+
+import { useI18n } from '@kanjou/react'
 import Image from 'next/image'
 import Link from 'next/link'
 
@@ -14,6 +17,8 @@ interface FilmCardProps {
 }
 
 export function FilmCard({ film, withActors }: FilmCardProps) {
+  const { t } = useI18n()
+
   return (
     <div className="flex flex-col gap-2 w-full">
       <div className="w-full relative aspect-2/3">
@@ -35,7 +40,7 @@ export function FilmCard({ film, withActors }: FilmCardProps) {
       {withActors && (
         <div>
           <Typography tag="h4" variant="body-sm" className="mb-[8px]">
-            Актёры
+            {t('film.actors')}
           </Typography>
           <div className="flex w-full justify-between overflow-x-auto gap-[8px] no-scrollbar scroll-smooth -mr-[12px]">
             {film.actors.slice(0, 4).map((actor) => (
@@ -58,7 +63,7 @@ export function FilmCard({ film, withActors }: FilmCardProps) {
         href={`/film/${film.id}`}
         className={buttonVariants({ size: 'large', className: 'w-full' })}
       >
-        Подробнее
+        {t('button.details')}
       </Link>
     </div>
   )

@@ -1,3 +1,6 @@
+'use client'
+
+import { useI18n } from '@kanjou/react'
 import { ChevronLeft } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
@@ -9,6 +12,7 @@ import { Typography } from '@/components/ui/typography'
 import { useOtpStep } from './hooks/use-otp-step'
 
 export function OtpStep() {
+  const { t } = useI18n()
   const { mutations, functions, features } = useOtpStep()
 
   return (
@@ -18,24 +22,24 @@ export function OtpStep() {
           <ChevronLeft />
         </button>
         <Typography tag="h1" variant="title-md">
-          Проверочный код
+          {t('auth.otp.title')}
         </Typography>
       </div>
       <div className="mt-[24px] flex flex-col gap-[24px]">
         <Typography tag="div" variant="body-sm">
-          На указанный вами номер был отправлен проверочный код
+          {t('auth.otp.description')}
         </Typography>
 
         <Field>
-          <FieldLabel>Код</FieldLabel>
+          <FieldLabel>{t('input.otp.label')}</FieldLabel>
           <Input
-            placeholder="Проверочный код"
+            placeholder={t('input.otp.placeholder')}
             {...features.otpField.register({
-              pattern: { value: /^\d{6}$/, message: 'Неверный код' },
+              pattern: { value: /^\d{6}$/, message: 'validation.invalid-otp' },
             })}
             aria-invalid={!!features.otpField.error}
           />
-          {features.otpField.error && <FieldError>{features.otpField.error}</FieldError>}
+          {features.otpField.error && <FieldError>{t(features.otpField.error)}</FieldError>}
         </Field>
 
         <div className="py-[16px] flex flex-col gap-[10px]">
@@ -45,7 +49,7 @@ export function OtpStep() {
             size="large"
             className="w-full"
           >
-            Войти
+            {t('button.sign-in')}
             {mutations.signIn.isLoading && <Loader />}
           </Button>
           <Button
@@ -55,11 +59,12 @@ export function OtpStep() {
             size="large"
             className="w-full"
           >
-            {!features.timer.active && <>Отправить код повторно</>}
+            {!features.timer.active && <>{t('button.resend-otp')}</>}
             {features.timer.active && (
               <>
-                Отправить код повторно через {features.timer.seconds + features.timer.minutes * 60}{' '}
-                сек
+                {t('button.resend-otp-timer', {
+                  time: features.timer.seconds + features.timer.minutes * 60,
+                })}
               </>
             )}
             {mutations.createOtp.isLoading && <Loader />}

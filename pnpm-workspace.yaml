@@ -5,5 +5,8 @@ allowBuilds:
 ignoredBuiltDependencies:
   - sharp
   - unrs-resolver
+minimumReleaseAgeExclude:
+  - '@kanjou/config@0.0.10'
+  - '@kanjou/react@0.0.11'
 onlyBuiltDependencies:
   - lefthook

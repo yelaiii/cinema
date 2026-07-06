@@ -2,8 +2,7 @@ import { useField, useMutation } from '@siberiacancode/reactuse'
 import { parseAsFloat, useQueryState } from 'nuqs'
 
 import { postAuthOtp } from '@/api'
-
-import { AuthFlowUrlParams, AuthFlowStep } from '../../../_constants'
+import { AuthFlowUrlParams, AuthFlowStep } from '@/app/auth/_constants'
 
 export function usePhoneStep() {
   const [phone, setPhone] = useQueryState(AuthFlowUrlParams.PHONE)

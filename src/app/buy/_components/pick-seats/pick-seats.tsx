@@ -1,6 +1,7 @@
 'use client'
 
 import { Popover } from '@base-ui/react/popover'
+import { useI18n } from '@kanjou/react'
 import { ChevronLeft, XIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
@@ -17,6 +18,7 @@ export interface HallSeat {
 }
 
 export function PickSeats() {
+  const { t } = useI18n()
   const { state, queries, functions } = usePickSeats()
   const [isMounted, setIsMounted] = useState(false)
 
@@ -31,12 +33,12 @@ export function PickSeats() {
       <div className="md:hidden h-[56px] gap-[16px] flex items-center">
         <ChevronLeft className="cursor-pointer" onClick={functions.handleBack} tabIndex={0} />
         <Typography tag="h1" variant="title-md">
-          Выбор места
+          {t('buy.pick-seats.title')}
         </Typography>
       </div>
 
       <div className="mt-[24px]">
-        <Typography variant="caption">Шаг 1 из 4</Typography>
+        <Typography variant="caption">{t('buy.step-format', { current: 1, total: 4 })}</Typography>
         <div className="relative">
           <div className="absolute w-full bg-muted h-[4px] rounded-[16px]"></div>
           <div className="absolute w-1/4 bg-pink-500 h-[4px] rounded-[16px]"></div>
@@ -47,7 +49,7 @@ export function PickSeats() {
 
       {!showSkeleton && state.seats && (
         <div className="mt-[24px] w-full">
-          <Typography variant="body-sm">Ряд</Typography>
+          <Typography variant="body-sm">{t('buy.pick-seats.row')}</Typography>
           <div className="overflow-x-auto scale-y-[-1] py-[12px]">
             <div className="flex flex-col gap-y-[24px] scale-y-[-1]">
               {state.seats.map((row, i) => (
@@ -65,7 +67,7 @@ export function PickSeats() {
                     <Popover.Root key={j}>
                       <Popover.Trigger
                         openOnHover
-                        aria-label="Подробнее"
+                        aria-label={t('button.details')}
                         data-selected={
                           state.selectedSeats.some((s) => s.row === i && s.column === j) ||
                           undefined
@@ -111,7 +113,7 @@ export function PickSeats() {
                               />
                             </div>
                             <p className="font-500 text-[12px] leading-[16px] tracking-[0.5%] text-muted-foreground">
-                              {i + 1} ряд, {j + 1} место
+                              {t('common.row-seat-format', { row: i + 1, seat: j + 1 })}
                             </p>
                           </Popover.Popup>
                         </Popover.Positioner>
@@ -128,15 +130,15 @@ export function PickSeats() {
       <div className="flex justify-between mt-[24px]">
         <div className="flex items-center">
           <div className="size-[24px] bg-neutral-900 rounded-[4px] mr-[8px]" />
-          <Typography variant="body-sm">Заняты</Typography>
+          <Typography variant="body-sm">{t('buy.pick-seats.occupied')}</Typography>
         </div>
         <div className="flex items-center">
           <div className="size-[24px] bg-pink-200 rounded-[4px] mr-[8px]" />
-          <Typography variant="body-sm">Выбраны</Typography>
+          <Typography variant="body-sm">{t('buy.pick-seats.selected')}</Typography>
         </div>
         <div className="flex items-center">
           <div className="size-[24px] bg-neutral-200 rounded-[4px] mr-[8px]" />
-          <Typography variant="body-sm">Доступны</Typography>
+          <Typography variant="body-sm">{t('buy.pick-seats.available')}</Typography>
         </div>
       </div>
 
@@ -146,7 +148,7 @@ export function PickSeats() {
         disabled={!state.selectedSeats.length}
         className="w-[unset] bottom-[20px] right-[20px] left-[20px] fixed"
       >
-        Продолжить
+        {t('button.continue')}
       </Button>
     </div>
   )

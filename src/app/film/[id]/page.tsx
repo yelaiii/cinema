@@ -9,6 +9,7 @@ import { getCinemaFilmByFilmId, getCinemaFilmByFilmIdSchedule, getCinemaFilms } 
 import { formatGenres } from '@/app/_utils/format-genres'
 import { Badge } from '@/components/ui/badge'
 import { Typography } from '@/components/ui/typography'
+import { getI18n } from '@/lib/i18n'
 
 import { ScheduleSelector } from './_components/schedule-selector'
 
@@ -24,7 +25,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export async function generateStaticParams() {
-  const films = await getCinemaFilms()
+  const films = await getCinemaFilms().catch(() => ({ data: { films: [] } }))
   return films.data.films.map((film) => ({ id: film.id }))
 }
 
@@ -47,6 +48,8 @@ export default async function FilmPage({ params }: { params: Promise<{ id: strin
     })
   })
 
+  const { t } = await getI18n()
+
   return (
     <div>
       <div className="md:hidden h-[56px] gap-[16px] flex items-center">
@@ -54,7 +57,7 @@ export default async function FilmPage({ params }: { params: Promise<{ id: strin
           <ChevronLeft />
         </Link>
         <Typography tag="h1" variant="title-md">
-          О фильме
+          {t('film.about')}
         </Typography>
       </div>
       <div>

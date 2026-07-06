@@ -1,20 +1,20 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import z from 'zod'
 
 import { useUser } from '@/app/_contexts/user'
 import { BuyFlowUrlParams, BuyFlowStep } from '@/app/buy/_constants'
 
-export const contactsSchema = z.object({
-  lastName: z.string().trim().min(1, 'Поле обязательно для заполнения'),
-  firstName: z.string().trim().min(1, 'Поле обязательно для заполнения'),
-  middleName: z.string().trim().min(1, 'Поле обязательно для заполнения'),
-  city: z.string().trim().min(1, 'Поле обязательно для заполнения'),
-  phone: z.e164('Неверный номер телефона'),
-  email: z.email('Некорректный email').trim().min(1, 'Поле обязательно для заполнения'),
+export const ContactsSchema = z.object({
+  lastName: z.string().trim().min(1, 'validation.required'),
+  firstName: z.string().trim().min(1, 'validation.required'),
+  middleName: z.string().trim().min(1, 'validation.required'),
+  city: z.string().trim().min(1, 'validation.required'),
+  phone: z.e164('validation.invalid-phone'),
+  email: z.email('validation.invalid-email').trim().min(1, 'validation.required'),
 })
-export type ContactsFormValues = z.infer<typeof contactsSchema>
+export type ContactsFormValues = z.infer<typeof ContactsSchema>
 
 export function useContacts() {
   const router = useRouter()
@@ -23,7 +23,7 @@ export function useContacts() {
   const { user } = useUser()
 
   const contactsForm = useForm<ContactsFormValues>({
-    resolver: zodResolver(contactsSchema),
+    resolver: zodResolver(ContactsSchema),
     mode: 'all',
     values: {
       lastName: searchParams.get(BuyFlowUrlParams.LAST_NAME) || user?.lastname || '',
